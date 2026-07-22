@@ -1,0 +1,7 @@
+.next
+node_modules
+supabase/.temp
+
+# Regenerated raw by `supabase gen types` — formatting it would just get
+# undone (and re-diffed) the next time that command runs.
+types/database.ts

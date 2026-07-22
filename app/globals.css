@@ -1,0 +1,320 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   OBS Design System — single source of truth
+   Extracted verbatim from the shipped HTML `:root` (warm oxblood palette).
+   This replaces the 13 duplicated :root blocks. Values here are canonical;
+   OBS-Design-Tokens-Figma-Handoff.md is kept in sync with these.
+   ========================================================================== */
+
+@theme {
+  /* ---- Color (Brand) ---- */
+  --color-gold: #febe52;
+  --color-gold-deep: #d89a2e;
+  --color-cream: #f9ecc9;
+  --color-paper: #f4e9d6;
+  --color-ink: #2b2420;
+  --color-ink-muted: #5c4f3e;
+  --color-line: #d9c7a0;
+  --color-oxblood: #7a2e24;
+  --color-oxblood-deep: #5e211a;
+
+  /* ---- Color (Semantic — dashboard trend indicators) ---- */
+  --color-positive: #3f7d4f;
+  --color-negative: #b4472f;
+
+  /* ---- Type families (wired to next/font in layout.tsx) ---- */
+  --font-display: var(--font-fraunces), Georgia, serif; /* Fraunces */
+  --font-reading: var(--font-lora), Georgia, serif; /* Lora */
+  --font-ui: var(--font-inter), system-ui, sans-serif; /* Inter */
+
+  /* ---- Corner radius ---- */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-full: 100px;
+
+  /* ---- Effects ---- */
+  --shadow-card-hover: 0 18px 34px -18px rgba(26, 26, 26, 0.28);
+
+  /* ---- Layout ---- */
+  --container-max: 1240px;
+}
+
+/* ============================================================================
+   Base — ported from the shared reset in the source files
+   ========================================================================== */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Layout helpers + typography scale (Text Styles from the handoff, kept fluid
+   with clamp() exactly as the source build did).
+   ========================================================================== */
+@layer components {
+  /* Container: 1240px max, 40px side padding desktop / 24px at <=980px
+     (matches the shipped `.wrap` responsive rule exactly). */
+  .wrap {
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: 40px;
+  }
+  @media (max-width: 980px) {
+    .wrap {
+      padding-inline: 24px;
+    }
+  }
+  @media (max-width: 620px) {
+    .wrap {
+      padding-inline: 20px;
+    }
+  }
+
+  /* Homepage section rhythm: 96px desktop / 64px <=620px */
+  .section-pad {
+    padding-block: 96px;
+  }
+  @media (max-width: 620px) {
+    .section-pad {
+      padding-block: 64px;
+    }
+  }
+
+  /* Interior-page section rhythm: 88px desktop / 56px <=620px */
+  .section-pad-page {
+    padding-block: 88px;
+  }
+  @media (max-width: 620px) {
+    .section-pad-page {
+      padding-block: 56px;
+    }
+  }
+
+  /* Display / headline (Fraunces) */
+  .text-hero {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(38px, 4.6vw, 60px);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+  }
+  .text-h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 3vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .text-h3-card {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.28;
+  }
+  .text-verse {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(26px, 3.4vw, 42px);
+    line-height: 1.32;
+    letter-spacing: -0.005em;
+  }
+  .text-panel-heading {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(16px, 1.4vw, 17px);
+    line-height: 1.3;
+  }
+  .text-metric {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(30px, 3.4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  /* Reading (Lora) */
+  .text-body-reading {
+    font-family: var(--font-reading);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  /* UI (Inter) */
+  .text-eyebrow {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .text-nav {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 14.5px;
+    line-height: 1.2;
+  }
+}
+
+/* ============================================================================
+   Sparkle / glint motif — recurring illumination accent (from the logo "O")
+   ========================================================================== */
+@layer components {
+  .sparkle {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  .sparkle path {
+    fill: var(--color-gold-deep);
+  }
+  .sparkle.on-dark path {
+    fill: var(--color-gold);
+  }
+  .glint {
+    position: absolute;
+    opacity: 0;
+    animation: glint 4.5s ease-in-out infinite;
+  }
+  .glint:nth-child(2) {
+    animation-delay: 1.4s;
+  }
+  .glint:nth-child(3) {
+    animation-delay: 2.8s;
+  }
+  @keyframes glint {
+    0% {
+      opacity: 0;
+      transform: scale(0.6) rotate(0deg);
+    }
+    12% {
+      opacity: 1;
+      transform: scale(1) rotate(8deg);
+    }
+    24% {
+      opacity: 0;
+      transform: scale(0.6) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Tiptap's ProseMirror content div — the CMS's Substack/Medium-style
+     writing surface (app/(protected)/cms/RichTextEditor.tsx) and the public
+     article body it renders into (article_body.html via dangerouslySetInnerHTML,
+     sanitized server-side) share this styling so what staff write matches
+     what visitors read. */
+  .prose-editor :where(h1, h2, h3) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
+  .prose-editor h1 {
+    font-size: 28px;
+    margin: 28px 0 14px;
+  }
+  .prose-editor h2 {
+    font-size: 24px;
+    margin: 26px 0 12px;
+  }
+  .prose-editor h3 {
+    font-size: 20px;
+    margin: 22px 0 10px;
+  }
+  .prose-editor p {
+    margin: 0 0 18px;
+  }
+  .prose-editor ul,
+  .prose-editor ol {
+    margin: 0 0 18px;
+    padding-left: 1.4em;
+  }
+  .prose-editor li {
+    margin: 0 0 6px;
+  }
+  .prose-editor blockquote {
+    border-left: 3px solid var(--color-gold);
+    padding-left: 26px;
+    margin: 26px 0;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--color-ink);
+  }
+  .prose-editor a {
+    color: var(--color-gold-deep);
+    text-decoration: underline;
+  }
+  .prose-editor img {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+    margin: 22px 0;
+  }
+  .prose-editor p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: var(--color-ink-muted);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

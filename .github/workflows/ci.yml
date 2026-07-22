@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        # None of these need to be real for typecheck/lint/build to pass —
+        # nothing at build time makes an authenticated call with them (the
+        # only external fetch during the build is the public Substack RSS
+        # feed, which needs no credentials). Add the real values as repo
+        # secrets instead if you want CI to double as a deploy-readiness
+        # check against the actual Supabase project.
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          RESEND_API_KEY: placeholder
