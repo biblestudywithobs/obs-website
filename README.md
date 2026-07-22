@@ -106,6 +106,12 @@ Anything that's pure logic but currently lives inside a file that imports `next/
 
 `.github/workflows/ci.yml` runs typecheck → lint → format check → test → build on every push/PR to `main`. The build step uses placeholder values for the Supabase/Resend env vars rather than real secrets — nothing at build time makes an authenticated call with them (the only external fetch during the build is the public Substack RSS feed, which needs no credentials). Add the real values as repository secrets instead if you want CI to double as a deploy-readiness check against the actual Supabase project.
 
+## Deployment
+
+Deployed on **Netlify**, connected directly to this GitHub repo — every push to `main` deploys to production, every PR gets a preview URL. Netlify's Next.js Runtime (`netlify.toml`) packages the app into its own serverless functions; the real environment variables (same list as `.env.example`, minus `SUPABASE_ACCESS_TOKEN`, which is CLI-only) live in Netlify's Project Settings → Environment Variables, not in a committed file.
+
+A `Dockerfile` is also in the repo as a self-hosting option, but isn't part of this deployment path — Netlify's adapter expects the standard `.next` build output, which is why `next.config.ts` deliberately does _not_ set `output: "standalone"` (that flag is only for the Docker route; re-add it there first if the Dockerfile ever gets used for real).
+
 ## Notes
 
 - **RLS is the real access boundary.** Every page-level `requireRole()`/`requireProfile()` check is a UX convenience — the Postgres Row Level Security policies in `supabase/migrations/0002_rls.sql` (and later migrations) are what actually enforce who can read or write what, independent of the app.
