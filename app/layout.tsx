@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
     url: "/",
-    siteName: "Open Bible School",
+    siteName: "BibleStudyWithOBS",
     images: [{ url: "/logo.jpg", width: 1500, height: 1500, alt: "Open Bible School" }],
     locale: "en_US",
     type: "website",
