@@ -1,37 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createAuthRecoveryClient } from "@/lib/supabase/auth-recovery-client";
 import { StaffButton } from "@/components/staff/StaffButton";
 
 type Stage = "checking" | "ready" | "invalid" | "saving" | "done" | "error";
 
 // Client-rendered because the recovery session only exists in the browser:
-// Supabase's reset-password email link either sets it via a URL hash
-// (#access_token=...&type=recovery, auto-detected by the browser client on
-// load) or a ?code= param (PKCE, exchanged explicitly below) — a server
-// component/middleware request never sees either.
+// the reset email's link carries an #access_token=...&type=recovery hash,
+// auto-detected by this client on creation (a server component/middleware
+// request never sees a URL hash at all — it's not sent to the server).
+// Uses the same non-SSR recovery client as requestPasswordReset — see
+// lib/supabase/auth-recovery-client.ts for why the normal @supabase/ssr
+// client can't be used here. One instance for the whole page (not
+// recreated per handler) so there's no doubt it's the same session.
 export default function ResetPasswordPage() {
   const [stage, setStage] = useState<Stage>("checking");
   const [password, setPassword] = useState("");
+  const supabaseRef = useRef(createAuthRecoveryClient());
 
   useEffect(() => {
-    const supabase = createClient();
-
     async function establishSession() {
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get("code");
-
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        setStage(error ? "invalid" : "ready");
-        return;
-      }
-
-      // Implicit flow: the browser client auto-detects the #access_token
-      // hash on creation. Give it a tick, then check.
-      const { data } = await supabase.auth.getSession();
+      // Give the client's own hash auto-detection (triggered on creation)
+      // a chance to finish — getSession() internally awaits that.
+      const { data } = await supabaseRef.current.auth.getSession();
       setStage(data.session ? "ready" : "invalid");
     }
 
@@ -41,13 +34,12 @@ export default function ResetPasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStage("saving");
-    const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await supabaseRef.current.auth.updateUser({ password });
     if (error) {
       setStage("error");
       return;
     }
-    await supabase.auth.signOut();
+    await supabaseRef.current.auth.signOut();
     setStage("done");
   }
 

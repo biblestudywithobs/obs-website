@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAuthRecoveryClient } from "@/lib/supabase/auth-recovery-client";
 
 export type SignInState = { error: string | null };
 
@@ -45,7 +46,7 @@ export async function requestPasswordReset(
   const protocol =
     hdrs.get("x-forwarded-proto") ?? (host?.includes("localhost") ? "http" : "https");
 
-  const supabase = await createClient();
+  const supabase = createAuthRecoveryClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${protocol}://${host}/staff/reset-password`,
   });
