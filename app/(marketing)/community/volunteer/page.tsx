@@ -39,6 +39,10 @@ export default function VolunteerPage() {
             }}
             askGender
             askLocation
+            askChurch
+            askWorkforce
+            askBibleStudyRating
+            askReadArticles
             hoursOptions={HOURS_PER_WEEK}
           />
         </div>

@@ -25,6 +25,7 @@ export const applicationAreas = [
   "internship",
   "community_group",
   "team",
+  "partnership",
 ] as const;
 
 export const communitySchema = z.object({
@@ -49,6 +50,11 @@ export const communitySchema = z.object({
   // Volunteer + Internship — where the applicant is applying from.
   state: z.string().trim().max(100).optional().or(z.literal("")),
   country: z.string().trim().max(100).optional().or(z.literal("")),
+  // Volunteer + Internship — church background and spiritual walk.
+  church: z.string().trim().max(200).optional().or(z.literal("")),
+  workforce: z.string().trim().max(20).optional().or(z.literal("")),
+  bibleStudyRating: z.string().trim().max(50).optional().or(z.literal("")),
+  readArticles: z.string().trim().max(20).optional().or(z.literal("")),
   message: z.string().trim().max(5000).optional().or(z.literal("")),
   website: honeypot,
 });

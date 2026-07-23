@@ -32,6 +32,12 @@ describe("communityConfirmationSubject", () => {
     );
   });
 
+  it("returns the Partnerships subject for area=partnership", () => {
+    expect(communityConfirmationSubject("partnership")).toBe(
+      "Thank you for your interest in partnering with OBS",
+    );
+  });
+
   it("falls back to the volunteer subject for an unrecognized area", () => {
     expect(communityConfirmationSubject("something_unexpected")).toBe(
       "Thank you for applying to volunteer with OBS",

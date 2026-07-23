@@ -39,6 +39,16 @@ const CONTENT = {
       "May the Lord establish you in His truth and grant you grace to delight in His Word each day.",
     ],
   },
+  partnership: {
+    subject: "Thank you for your interest in partnering with OBS",
+    paragraphs: [
+      "Thank you for reaching out about partnering with Open Bible School (OBS). We are grateful for your desire to stand with us as we help people understand the Scriptures in a simple, clear, and faithful way.",
+      "The Lord has used the generosity and partnership of faithful believers throughout history to advance the preaching and teaching of His Word (Philippians 4:15-17), and we do not take your interest in partnering with us lightly.",
+      "We have received your inquiry, and a member of our team will be in touch with you personally to discuss how we might partner together — whether through financial support, resource collaboration, or another way the Lord has laid on your heart.",
+      "Thank you for considering this step. We pray the Lord would continue to multiply the fruit of every gift and partnership for the sake of His Church.",
+      "May the Lord bless you richly for your generosity and willingness to serve alongside us.",
+    ],
+  },
 } as const;
 
 // internship and team reuse the volunteer letter — OBS hasn't written
@@ -49,6 +59,7 @@ const AREA_TO_CONTENT: Record<string, keyof typeof CONTENT> = {
   team: "volunteer",
   bible_study_partner: "bible_study_partner",
   community_group: "community_group",
+  partnership: "partnership",
 };
 
 export function communityConfirmationSubject(area: string): string {

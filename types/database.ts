@@ -129,6 +129,8 @@ export type Database = {
       community_applications: {
         Row: {
           area: Database["public"]["Enums"]["application_area"]
+          bible_study_rating: string | null
+          church: string | null
           country: string | null
           created_at: string
           email: string
@@ -139,12 +141,16 @@ export type Database = {
           message: string | null
           name: string
           phone: string | null
+          read_articles: string | null
           role_detail: string | null
           state: string | null
           status: Database["public"]["Enums"]["application_status"]
+          workforce: string | null
         }
         Insert: {
           area: Database["public"]["Enums"]["application_area"]
+          bible_study_rating?: string | null
+          church?: string | null
           country?: string | null
           created_at?: string
           email: string
@@ -155,12 +161,16 @@ export type Database = {
           message?: string | null
           name: string
           phone?: string | null
+          read_articles?: string | null
           role_detail?: string | null
           state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          workforce?: string | null
         }
         Update: {
           area?: Database["public"]["Enums"]["application_area"]
+          bible_study_rating?: string | null
+          church?: string | null
           country?: string | null
           created_at?: string
           email?: string
@@ -171,9 +181,11 @@ export type Database = {
           message?: string | null
           name?: string
           phone?: string | null
+          read_articles?: string | null
           role_detail?: string | null
           state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          workforce?: string | null
         }
         Relationships: []
       }
@@ -632,6 +644,7 @@ export type Database = {
         | "internship"
         | "community_group"
         | "team"
+        | "partnership"
       application_status: "new" | "reviewed" | "accepted" | "declined"
       content_status: "draft" | "in_review" | "published"
       lesson_progress_status: "not_started" | "in_progress" | "done"
@@ -790,6 +803,7 @@ export const Constants = {
         "internship",
         "community_group",
         "team",
+        "partnership",
       ],
       application_status: ["new", "reviewed", "accepted", "declined"],
       content_status: ["draft", "in_review", "published"],

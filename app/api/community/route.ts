@@ -16,6 +16,7 @@ const areaLabels: Record<string, string> = {
   internship: "Internships",
   community_group: "Community Groups",
   team: "Join the OBS Team",
+  partnership: "Partnerships",
 };
 
 export async function POST(request: Request) {
@@ -45,6 +46,10 @@ export async function POST(request: Request) {
     hoursPerWeek,
     state,
     country,
+    church,
+    workforce,
+    bibleStudyRating,
+    readArticles,
     message,
   } = parsed.data;
 
@@ -60,6 +65,10 @@ export async function POST(request: Request) {
     hours_per_week: hoursPerWeek || null,
     state: state || null,
     country: country || null,
+    church: church || null,
+    workforce: workforce || null,
+    bible_study_rating: bibleStudyRating || null,
+    read_articles: readArticles || null,
     message: message || null,
   });
 
@@ -71,7 +80,17 @@ export async function POST(request: Request) {
   }
 
   const applicantLocation = [state, country].filter(Boolean).join(", ");
-  const detailLine = [roleDetail, location, gender, hoursPerWeek, applicantLocation]
+  const detailLine = [
+    roleDetail,
+    location,
+    gender,
+    hoursPerWeek,
+    applicantLocation,
+    church && `Church: ${church}`,
+    workforce && `Workforce: ${workforce}`,
+    bibleStudyRating && `Bible study/prayer life: ${bibleStudyRating}`,
+    readArticles && `Read our articles: ${readArticles}`,
+  ]
     .filter(Boolean)
     .join(" · ");
   const siteUrl = new URL(request.url).origin;

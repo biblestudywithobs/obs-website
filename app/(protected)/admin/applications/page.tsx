@@ -12,6 +12,7 @@ const areaLabels: Record<string, string> = {
   internship: "Internships",
   community_group: "Community Groups",
   team: "Join the OBS Team",
+  partnership: "Partnerships",
 };
 
 type Area = (typeof applicationAreas)[number];
@@ -34,7 +35,7 @@ export default async function ApplicationsPage({
   let query = supabase
     .from("community_applications")
     .select(
-      "id, name, email, phone, area, role_detail, location, gender, hours_per_week, state, country, message, created_at",
+      "id, name, email, phone, area, role_detail, location, gender, hours_per_week, state, country, church, workforce, bible_study_rating, read_articles, message, created_at",
     )
     .order("created_at", { ascending: false });
   if (activeArea !== "all") {
@@ -96,6 +97,10 @@ export default async function ApplicationsPage({
                   app.gender,
                   app.hours_per_week,
                   applicantLocation,
+                  app.church && `Church: ${app.church}`,
+                  app.workforce && `Workforce: ${app.workforce}`,
+                  app.bible_study_rating && `Bible study/prayer life: ${app.bible_study_rating}`,
+                  app.read_articles && `Read our articles: ${app.read_articles}`,
                 ]
                   .filter(Boolean)
                   .join(" · ");

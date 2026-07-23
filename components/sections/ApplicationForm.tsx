@@ -14,6 +14,8 @@ type DetailField =
 type Status = "idle" | "submitting" | "done" | "error";
 
 const GENDER_OPTIONS = ["Male", "Female"];
+const YES_NO_OPTIONS = ["Yes", "No"];
+const BIBLE_STUDY_RATING_OPTIONS = ["Excellent", "Good", "Average", "Needs Improvement"];
 
 // Shared application form used by each dedicated /community/* page. Submits
 // to /api/community; `detailField` renders either a team/role select
@@ -25,6 +27,10 @@ export function ApplicationForm({
   detailField,
   askGender = false,
   askLocation = false,
+  askChurch = false,
+  askWorkforce = false,
+  askBibleStudyRating = false,
+  askReadArticles = false,
   hoursOptions,
   messageLabel = "Anything you'd like us to know? (optional)",
   messagePlaceholder = "Tell us a bit about yourself",
@@ -34,6 +40,10 @@ export function ApplicationForm({
   detailField?: DetailField;
   askGender?: boolean;
   askLocation?: boolean;
+  askChurch?: boolean;
+  askWorkforce?: boolean;
+  askBibleStudyRating?: boolean;
+  askReadArticles?: boolean;
   hoursOptions?: string[];
   messageLabel?: string;
   messagePlaceholder?: string;
@@ -62,6 +72,10 @@ export function ApplicationForm({
           hoursPerWeek: hoursOptions ? data.get("hoursPerWeek") : "",
           state: askLocation ? data.get("state") : "",
           country: askLocation ? data.get("country") : "",
+          church: askChurch ? data.get("church") : "",
+          workforce: askWorkforce ? data.get("workforce") : "",
+          bibleStudyRating: askBibleStudyRating ? data.get("bibleStudyRating") : "",
+          readArticles: askReadArticles ? data.get("readArticles") : "",
           message: data.get("message"),
           website: data.get("website"),
         }),
@@ -225,6 +239,88 @@ export function ApplicationForm({
               className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
             />
           </div>
+        </div>
+      )}
+
+      {askChurch && (
+        <div className="mb-[18px]">
+          <label htmlFor="apply-church" className="mb-[7px] block text-[12.5px] font-semibold">
+            What church do you attend?
+          </label>
+          <input
+            type="text"
+            id="apply-church"
+            name="church"
+            required
+            placeholder="Name of your church"
+            className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+          />
+        </div>
+      )}
+
+      {askWorkforce && (
+        <div className="mb-[18px]">
+          <label htmlFor="apply-workforce" className="mb-[7px] block text-[12.5px] font-semibold">
+            Are you part of the workforce?
+          </label>
+          <select
+            id="apply-workforce"
+            name="workforce"
+            required
+            className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+          >
+            {YES_NO_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {askBibleStudyRating && (
+        <div className="mb-[18px]">
+          <label
+            htmlFor="apply-bible-rating"
+            className="mb-[7px] block text-[12.5px] font-semibold"
+          >
+            How would you rate your Bible study and prayer life?
+          </label>
+          <select
+            id="apply-bible-rating"
+            name="bibleStudyRating"
+            required
+            className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+          >
+            {BIBLE_STUDY_RATING_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {askReadArticles && (
+        <div className="mb-[18px]">
+          <label
+            htmlFor="apply-read-articles"
+            className="mb-[7px] block text-[12.5px] font-semibold"
+          >
+            Have you read any of our articles?
+          </label>
+          <select
+            id="apply-read-articles"
+            name="readArticles"
+            required
+            className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+          >
+            {YES_NO_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
