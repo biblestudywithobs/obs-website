@@ -80,6 +80,7 @@ export type ArticleDetail = {
   tag: string;
   title: string;
   excerpt: string;
+  href: string | null;
   author: string;
   authorInitials: string;
   authorRole: string;
@@ -103,7 +104,7 @@ export async function getPublishedResourceBySlug(slug: string): Promise<ArticleD
   const { data } = await supabase
     .from("resources")
     .select(
-      "id, slug, tag, title, excerpt, body_html, updated_at, author:profiles(full_name, avatar_initials, role)",
+      "id, slug, tag, title, excerpt, href, body_html, updated_at, author:profiles(full_name, avatar_initials, role)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -125,7 +126,7 @@ export async function getPublishedResourceBySlug(slug: string): Promise<ArticleD
   const author = data.author;
   const authorName = author?.full_name ?? "OBS Faculty";
   const authorInitials = author?.avatar_initials || initialsFrom(authorName);
-  const authorRole = author ? staffRoleLabels[author.role] : "Teaching Team, Open Bible School";
+  const authorRole = author ? staffRoleLabels[author.role] : "Scholar Team, Open Bible School";
 
   const { data: relatedRows } = await supabase
     .from("resources")
@@ -140,6 +141,7 @@ export async function getPublishedResourceBySlug(slug: string): Promise<ArticleD
     tag: data.tag,
     title: data.title,
     excerpt: data.excerpt ?? "",
+    href: data.href,
     author: authorName,
     authorInitials,
     authorRole,

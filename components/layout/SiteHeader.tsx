@@ -38,8 +38,8 @@ export function SiteHeader() {
         <div className="wrap flex h-[76px] items-center justify-between">
           <Brandmark />
 
-          <nav aria-label="Primary" className="max-[980px]:hidden">
-            <ul className="flex gap-[34px] text-[14.5px] font-medium">
+          <nav aria-label="Primary" className="max-[1180px]:hidden">
+            <ul className="flex flex-nowrap gap-[24px] text-[14px] font-medium whitespace-nowrap">
               {primaryNav.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -54,10 +54,17 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-[22px]">
-            <Link href="/resources" className="text-[14.5px] font-medium max-[980px]:hidden">
+            <Link
+              href="/resources"
+              className="text-[14.5px] font-medium whitespace-nowrap max-[1180px]:hidden"
+            >
               Explore Resources
             </Link>
-            <Button type="button" onClick={() => setJoinOpen(true)} className="max-[980px]:hidden">
+            <Button
+              type="button"
+              onClick={() => setJoinOpen(true)}
+              className="max-[1180px]:hidden"
+            >
               Join OBS
             </Button>
 
@@ -68,7 +75,7 @@ export function SiteHeader() {
               aria-controls="mobileDrawer"
               onClick={() => setOpen((v) => !v)}
               className={cn(
-                "border-line hidden h-[38px] w-[38px] items-center justify-center rounded-[8px] border transition-colors max-[980px]:flex",
+                "border-line hidden h-[38px] w-[38px] items-center justify-center rounded-[8px] border transition-colors max-[1180px]:flex",
                 open && "border-ink",
               )}
             >

@@ -64,6 +64,30 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <span className="bg-ink-muted h-[3px] w-[3px] rounded-full" />
               <span>{article.updated}</span>
             </div>
+            {article.excerpt && (
+              <p className="font-reading text-ink-muted mx-auto mt-5 max-w-[56ch] text-[16px] leading-[1.6]">
+                {article.excerpt}
+              </p>
+            )}
+            {article.href && (
+              <a
+                href={article.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gold text-ink hover:bg-gold-deep mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-colors"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M10 3v10m0 0l-4-4m4 4l4-4M4 16.5h12"
+                    stroke="#2B2420"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Download PDF
+              </a>
+            )}
           </div>
 
           <div className="relative mx-auto aspect-[21/9] max-w-[960px] overflow-hidden rounded-[20px]">

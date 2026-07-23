@@ -17,6 +17,10 @@ export async function getLatestByTab(): Promise<Record<LatestTab, LatestItem[]>>
         .from("resources")
         .select("slug, title, tag")
         .eq("status", "published")
+        // Only "Articles" are guaranteed to have body content and route to
+        // /articles/[slug] (see the same category check in public-resources.ts)
+        // — other categories are downloadable/reference material, not reading.
+        .eq("category", "Articles")
         .order("published_at", { ascending: false })
         .limit(3),
       supabase
