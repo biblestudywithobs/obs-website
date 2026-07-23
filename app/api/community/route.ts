@@ -34,8 +34,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const { name, email, phone, area, roleDetail, location, gender, hoursPerWeek, message } =
-    parsed.data;
+  const {
+    name,
+    email,
+    phone,
+    area,
+    roleDetail,
+    location,
+    gender,
+    hoursPerWeek,
+    state,
+    country,
+    message,
+  } = parsed.data;
 
   const supabase = await createClient();
   const { error } = await supabase.from("community_applications").insert({
@@ -47,6 +58,8 @@ export async function POST(request: Request) {
     location: location || null,
     gender: gender || null,
     hours_per_week: hoursPerWeek || null,
+    state: state || null,
+    country: country || null,
     message: message || null,
   });
 
@@ -57,7 +70,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const detailLine = [roleDetail, location, gender, hoursPerWeek].filter(Boolean).join(" · ");
+  const applicantLocation = [state, country].filter(Boolean).join(", ");
+  const detailLine = [roleDetail, location, gender, hoursPerWeek, applicantLocation]
+    .filter(Boolean)
+    .join(" · ");
   const siteUrl = new URL(request.url).origin;
   const resend = getResendClient();
 

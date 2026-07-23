@@ -129,6 +129,7 @@ export type Database = {
       community_applications: {
         Row: {
           area: Database["public"]["Enums"]["application_area"]
+          country: string | null
           created_at: string
           email: string
           gender: string | null
@@ -139,10 +140,12 @@ export type Database = {
           name: string
           phone: string | null
           role_detail: string | null
+          state: string | null
           status: Database["public"]["Enums"]["application_status"]
         }
         Insert: {
           area: Database["public"]["Enums"]["application_area"]
+          country?: string | null
           created_at?: string
           email: string
           gender?: string | null
@@ -153,10 +156,12 @@ export type Database = {
           name: string
           phone?: string | null
           role_detail?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
         }
         Update: {
           area?: Database["public"]["Enums"]["application_area"]
+          country?: string | null
           created_at?: string
           email?: string
           gender?: string | null
@@ -167,6 +172,7 @@ export type Database = {
           name?: string
           phone?: string | null
           role_detail?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
         }
         Relationships: []

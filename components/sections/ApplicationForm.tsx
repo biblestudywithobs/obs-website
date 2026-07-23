@@ -24,6 +24,7 @@ export function ApplicationForm({
   area,
   detailField,
   askGender = false,
+  askLocation = false,
   hoursOptions,
   messageLabel = "Anything you'd like us to know? (optional)",
   messagePlaceholder = "Tell us a bit about yourself",
@@ -32,6 +33,7 @@ export function ApplicationForm({
   area: Area;
   detailField?: DetailField;
   askGender?: boolean;
+  askLocation?: boolean;
   hoursOptions?: string[];
   messageLabel?: string;
   messagePlaceholder?: string;
@@ -58,6 +60,8 @@ export function ApplicationForm({
           location: detailField?.kind === "text" ? data.get("detail") : "",
           gender: askGender ? data.get("gender") : "",
           hoursPerWeek: hoursOptions ? data.get("hoursPerWeek") : "",
+          state: askLocation ? data.get("state") : "",
+          country: askLocation ? data.get("country") : "",
           message: data.get("message"),
           website: data.get("website"),
         }),
@@ -190,6 +194,37 @@ export function ApplicationForm({
               </option>
             ))}
           </select>
+        </div>
+      )}
+
+      {askLocation && (
+        <div className="mb-[18px] flex gap-3">
+          <div className="flex-1">
+            <label htmlFor="apply-state" className="mb-[7px] block text-[12.5px] font-semibold">
+              State / Region
+            </label>
+            <input
+              type="text"
+              id="apply-state"
+              name="state"
+              required
+              placeholder="e.g. Lagos"
+              className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+            />
+          </div>
+          <div className="flex-1">
+            <label htmlFor="apply-country" className="mb-[7px] block text-[12.5px] font-semibold">
+              Country
+            </label>
+            <input
+              type="text"
+              id="apply-country"
+              name="country"
+              required
+              placeholder="e.g. Nigeria"
+              className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+            />
+          </div>
         </div>
       )}
 

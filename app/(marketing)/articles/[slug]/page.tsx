@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { getPublishedResourceBySlug } from "@/lib/queries/public-resources";
 
 export async function generateMetadata({
@@ -11,7 +12,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const article = await getPublishedResourceBySlug(slug);
-  return { title: article ? `${article.title} — Open Bible School` : "Open Bible School" };
+  if (!article) return { title: "Open Bible School" };
+
+  const title = `${article.title} — Open Bible School`;
+  const description = article.excerpt || undefined;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, url: `/articles/${slug}`, type: "article" },
+    twitter: { title, description },
+  };
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -101,24 +112,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
               <div className="flex gap-2.5">
-                <a
-                  href="#"
-                  aria-label="Share"
-                  className="border-line hover:border-gold-deep flex h-9 w-9 items-center justify-center rounded-full border"
-                >
-                  <svg className="h-[15px] w-[15px]" viewBox="0 0 20 20" fill="none">
-                    <path
-                      d="M6 10a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM14 3a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM14 12a2.5 2.5 0 100 5 2.5 2.5 0 000-5z"
-                      stroke="#2B2420"
-                      strokeWidth="1.4"
-                    />
-                    <path
-                      d="M8.2 11.4l5.6-3.4M8.2 13.6l5.6 3.4"
-                      stroke="#2B2420"
-                      strokeWidth="1.4"
-                    />
-                  </svg>
-                </a>
+                <ShareButton className="h-9 w-9" />
                 <a
                   href="#"
                   aria-label="Bookmark"

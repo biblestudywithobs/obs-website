@@ -38,6 +38,7 @@ export default function VolunteerPage() {
               options: VOLUNTEER_TEAMS,
             }}
             askGender
+            askLocation
             hoursOptions={HOURS_PER_WEEK}
           />
         </div>

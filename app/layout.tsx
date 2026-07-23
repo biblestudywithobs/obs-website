@@ -25,10 +25,29 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteTitle = "Open Bible School — Understand the Scriptures. Grow in Christ.";
+const siteDescription =
+  "Open Bible School — free reading plans, class sessions, resources and community to help you understand the Scriptures and grow in Christ.";
+
 export const metadata: Metadata = {
-  title: "Open Bible School — Understand the Scriptures. Grow in Christ.",
-  description:
-    "Open Bible School — free reading plans, class sessions, resources and community to help you understand the Scriptures and grow in Christ.",
+  metadataBase: new URL("https://biblestudywithobs.com"),
+  title: siteTitle,
+  description: siteDescription,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    url: "/",
+    siteName: "Open Bible School",
+    images: [{ url: "/logo.jpg", width: 1500, height: 1500, alt: "Open Bible School" }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/logo.jpg"],
+  },
 };
 
 export default function RootLayout({

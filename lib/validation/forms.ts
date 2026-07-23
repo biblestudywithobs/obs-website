@@ -46,6 +46,9 @@ export const communitySchema = z.object({
   // Volunteer-only.
   gender: z.string().trim().max(50).optional().or(z.literal("")),
   hoursPerWeek: z.string().trim().max(50).optional().or(z.literal("")),
+  // Volunteer + Internship — where the applicant is applying from.
+  state: z.string().trim().max(100).optional().or(z.literal("")),
+  country: z.string().trim().max(100).optional().or(z.literal("")),
   message: z.string().trim().max(5000).optional().or(z.literal("")),
   website: honeypot,
 });

@@ -34,7 +34,7 @@ export default async function ApplicationsPage({
   let query = supabase
     .from("community_applications")
     .select(
-      "id, name, email, phone, area, role_detail, location, gender, hours_per_week, message, created_at",
+      "id, name, email, phone, area, role_detail, location, gender, hours_per_week, state, country, message, created_at",
     )
     .order("created_at", { ascending: false });
   if (activeArea !== "all") {
@@ -89,7 +89,14 @@ export default async function ApplicationsPage({
           ) : (
             <div className="flex flex-col gap-3.5">
               {applications.map((app) => {
-                const detail = [app.role_detail, app.location, app.gender, app.hours_per_week]
+                const applicantLocation = [app.state, app.country].filter(Boolean).join(", ");
+                const detail = [
+                  app.role_detail,
+                  app.location,
+                  app.gender,
+                  app.hours_per_week,
+                  applicantLocation,
+                ]
                   .filter(Boolean)
                   .join(" · ");
                 return (

@@ -37,6 +37,7 @@ export default function InternshipsPage() {
               options: INTERNSHIP_ROLES,
             }}
             askGender
+            askLocation
             hoursOptions={HOURS_PER_WEEK}
           />
         </div>
