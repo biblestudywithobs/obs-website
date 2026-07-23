@@ -12,6 +12,12 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      // Must match the browser client (lib/supabase/client.ts) — this is the
+      // client that actually issues the password-reset email via
+      // resetPasswordForEmail(), so its flowType decides whether the link
+      // Supabase sends is a same-device-only PKCE code or a portable
+      // implicit-flow token. See the comment there for why implicit.
+      auth: { flowType: "implicit" },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -54,12 +54,6 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-[22px]">
-            <Link
-              href="/resources"
-              className="text-[14.5px] font-medium whitespace-nowrap max-[1320px]:hidden"
-            >
-              Explore Resources
-            </Link>
             <Button type="button" onClick={() => setJoinOpen(true)} className="max-[1320px]:hidden">
               Join OBS
             </Button>
