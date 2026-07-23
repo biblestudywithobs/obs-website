@@ -256,6 +256,57 @@
     }
   }
 
+  /* Hero book — plays once on load: both covers swing open from the spine,
+     then a soft light blooms outward. Origin point (240px 259px) is the
+     spine's center in the SVG's own viewBox coordinates, not a CSS layout
+     box, so plain pixel values (not percentages) are what anchor it there. */
+  @media (prefers-reduced-motion: no-preference) {
+    .book-page-left,
+    .book-page-right {
+      transform-origin: 240px 259px;
+      animation: book-open 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .book-bookmark {
+      opacity: 0;
+      animation: book-fade-in 0.6s ease-out 1s both;
+    }
+    .book-light {
+      opacity: 0;
+      transform-origin: 240px 259px;
+      animation: book-light-burst 1.6s ease-out 0.95s both;
+    }
+  }
+  @keyframes book-open {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes book-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes book-light-burst {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    40% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.7);
+    }
+  }
+
   /* Tiptap's ProseMirror content div — the CMS's Substack/Medium-style
      writing surface (app/(protected)/cms/RichTextEditor.tsx) and the public
      article body it renders into (article_body.html via dangerouslySetInnerHTML,

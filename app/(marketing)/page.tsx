@@ -124,70 +124,88 @@ export default async function Home() {
                 className="h-full w-full"
                 aria-hidden="true"
               >
+                <defs>
+                  <radialGradient id="bookGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#FFF6DE" stopOpacity="0.95" />
+                    <stop offset="55%" stopColor="#FEBE52" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#FEBE52" stopOpacity="0" />
+                  </radialGradient>
+                </defs>
                 <g>
-                  <path
-                    d="M240 130 C 190 108, 120 100, 68 112 L 68 372 C 120 358, 190 366, 240 388 Z"
-                    fill="#F9ECC9"
-                    stroke="#2B2420"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M240 130 C 290 108, 360 100, 412 112 L 412 372 C 360 358, 290 366, 240 388 Z"
-                    fill="#F4E9D6"
-                    stroke="#2B2420"
-                    strokeWidth="2"
-                  />
+                  <g className="book-page-left">
+                    <path
+                      d="M240 130 C 190 108, 120 100, 68 112 L 68 372 C 120 358, 190 366, 240 388 Z"
+                      fill="#F9ECC9"
+                      stroke="#2B2420"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M240 130 C 190 108, 120 100, 68 112"
+                      stroke="#D89A2E"
+                      strokeWidth="4"
+                      fill="none"
+                      opacity="0.6"
+                    />
+                    <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.55">
+                      <line x1="92" y1="152" x2="210" y2="140" />
+                      <line x1="90" y1="172" x2="214" y2="162" />
+                      <line x1="88" y1="192" x2="212" y2="184" />
+                      <line x1="88" y1="212" x2="208" y2="206" />
+                      <line x1="90" y1="232" x2="212" y2="228" />
+                      <line x1="92" y1="252" x2="206" y2="250" />
+                    </g>
+                    <rect
+                      x="86"
+                      y="265"
+                      width="128"
+                      height="12"
+                      rx="6"
+                      fill="#FEBE52"
+                      opacity="0.9"
+                    />
+                    <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.55">
+                      <line x1="88" y1="296" x2="210" y2="296" />
+                      <line x1="90" y1="316" x2="206" y2="318" />
+                      <line x1="92" y1="336" x2="200" y2="338" />
+                    </g>
+                  </g>
+
+                  <g className="book-page-right">
+                    <path
+                      d="M240 130 C 290 108, 360 100, 412 112 L 412 372 C 360 358, 290 366, 240 388 Z"
+                      fill="#F4E9D6"
+                      stroke="#2B2420"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M240 130 C 290 108, 360 100, 412 112"
+                      stroke="#D89A2E"
+                      strokeWidth="4"
+                      fill="none"
+                      opacity="0.6"
+                    />
+                    <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.4">
+                      <line x1="270" y1="140" x2="388" y2="152" />
+                      <line x1="266" y1="162" x2="390" y2="172" />
+                      <line x1="268" y1="184" x2="392" y2="192" />
+                      <line x1="272" y1="206" x2="388" y2="212" />
+                      <line x1="268" y1="228" x2="390" y2="232" />
+                      <line x1="270" y1="250" x2="384" y2="252" />
+                      <line x1="268" y1="272" x2="388" y2="276" />
+                      <line x1="270" y1="294" x2="386" y2="296" />
+                      <line x1="272" y1="316" x2="390" y2="316" />
+                      <line x1="270" y1="338" x2="384" y2="338" />
+                    </g>
+                  </g>
+
                   <path d="M240 130 L240 388" stroke="#2B2420" strokeWidth="2" />
-                  <path
-                    d="M240 130 C 190 108, 120 100, 68 112"
-                    stroke="#D89A2E"
-                    strokeWidth="4"
-                    fill="none"
-                    opacity="0.6"
-                  />
-                  <path
-                    d="M240 130 C 290 108, 360 100, 412 112"
-                    stroke="#D89A2E"
-                    strokeWidth="4"
-                    fill="none"
-                    opacity="0.6"
-                  />
-                  <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.55">
-                    <line x1="92" y1="152" x2="210" y2="140" />
-                    <line x1="90" y1="172" x2="214" y2="162" />
-                    <line x1="88" y1="192" x2="212" y2="184" />
-                    <line x1="88" y1="212" x2="208" y2="206" />
-                    <line x1="90" y1="232" x2="212" y2="228" />
-                    <line x1="92" y1="252" x2="206" y2="250" />
+
+                  <g className="book-bookmark">
+                    <path d="M256 106 L256 200 L240 186 L224 200 L224 108" fill="#D89A2E" />
                   </g>
-                  <rect
-                    x="86"
-                    y="265"
-                    width="128"
-                    height="12"
-                    rx="6"
-                    fill="#FEBE52"
-                    opacity="0.9"
-                  />
-                  <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.55">
-                    <line x1="88" y1="296" x2="210" y2="296" />
-                    <line x1="90" y1="316" x2="206" y2="318" />
-                    <line x1="92" y1="336" x2="200" y2="338" />
-                  </g>
-                  <g stroke="#2B2420" strokeWidth="2" strokeLinecap="round" opacity="0.4">
-                    <line x1="270" y1="140" x2="388" y2="152" />
-                    <line x1="266" y1="162" x2="390" y2="172" />
-                    <line x1="268" y1="184" x2="392" y2="192" />
-                    <line x1="272" y1="206" x2="388" y2="212" />
-                    <line x1="268" y1="228" x2="390" y2="232" />
-                    <line x1="270" y1="250" x2="384" y2="252" />
-                    <line x1="268" y1="272" x2="388" y2="276" />
-                    <line x1="270" y1="294" x2="386" y2="296" />
-                    <line x1="272" y1="316" x2="390" y2="316" />
-                    <line x1="270" y1="338" x2="384" y2="338" />
-                  </g>
-                  <path d="M256 106 L256 200 L240 186 L224 200 L224 108" fill="#D89A2E" />
                 </g>
+
+                <circle className="book-light" cx="240" cy="259" r="200" fill="url(#bookGlow)" />
 
                 <g className="glint" transform="translate(110,90)">
                   <svg className="sparkle" width="20" height="20" viewBox="0 0 24 24">
