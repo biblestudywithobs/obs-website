@@ -13,7 +13,9 @@ const VOLUNTEER_TEAMS = [
   "Podcast Productions",
   "Voice Over Artists",
   "Social Media Managers",
-  "Graphic Designers",
+  "Graphics Designers",
+  "Illustrators",
+  "Audio Editors",
   "Technical Staff",
   "Admin Staff",
 ];
