@@ -47,7 +47,11 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
 
   return (
     <>
-      <form ref={formRef} action={formAction} className="max-w-[720px]">
+      <form
+        ref={formRef}
+        action={formAction}
+        className="max-w-[720px] min-[1200px]:max-w-[860px] min-[1600px]:max-w-[980px]"
+      >
         {plan && <input type="hidden" name="id" value={plan.id} />}
 
         {state.error && (
