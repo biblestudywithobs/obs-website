@@ -60,12 +60,17 @@ export function ReadingPlanLibrary({
                   {featured.excerpt}
                 </p>
                 <div className="mt-[22px] flex gap-3">
-                  <Button href="#">Start Plan</Button>
+                  <Button href={`/reading-plans/${featured.slug}`}>Start Plan</Button>
                   <ShareButton label="Share plan" />
                 </div>
               </div>
               <div className="bg-gold relative h-[190px] w-[150px] shrink-0 overflow-hidden rounded-[14px]">
-                <div className="bg-gold-deep absolute top-0 right-[22px] h-[60px] w-4 [clip-path:polygon(0_0,100%_0,100%_100%,50%_80%,0_100%)]" />
+                {featured.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={featured.imageUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="bg-gold-deep absolute top-0 right-[22px] h-[60px] w-4 [clip-path:polygon(0_0,100%_0,100%_100%,50%_80%,0_100%)]" />
+                )}
               </div>
             </div>
           )}
@@ -115,10 +120,14 @@ export function ReadingPlanLibrary({
           <div className="grid grid-cols-3 gap-[22px] pb-[90px] max-[980px]:grid-cols-2 max-[620px]:grid-cols-1">
             {filtered.map((p) => (
               <div
-                key={p.title}
+                key={p.slug}
                 className="border-line bg-paper hover:shadow-card-hover overflow-hidden rounded-[16px] border transition-[transform,box-shadow] duration-200 hover:-translate-y-[3px]"
               >
-                <div className="bg-cream relative flex aspect-[16/10] items-center justify-center">
+                <div className="bg-cream relative flex aspect-[16/10] items-center justify-center overflow-hidden">
+                  {p.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.imageUrl} alt="" className="h-full w-full object-cover" />
+                  )}
                   <span className="bg-paper absolute top-[14px] right-[14px] rounded-full px-2.5 py-[5px] text-[11px] font-bold">
                     {p.duration}
                   </span>
@@ -131,7 +140,7 @@ export function ReadingPlanLibrary({
                     {p.excerpt}
                   </p>
                   <div className="flex items-center gap-2.5">
-                    <Button href="#" size="sm" className="flex-1">
+                    <Button href={`/reading-plans/${p.slug}`} size="sm" className="flex-1">
                       Start Plan
                     </Button>
                     <ShareButton />

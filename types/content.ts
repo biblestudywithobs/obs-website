@@ -40,8 +40,10 @@ export type LibraryResource = {
 };
 
 export type ReadingPlan = {
+  slug: string;
   category: string; // "Beginner" | "Topical" | "Book Study" | "Devotional"
   duration: string; // "7 days"
   title: string;
   excerpt: string;
+  imageUrl: string | null;
 };

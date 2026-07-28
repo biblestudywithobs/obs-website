@@ -524,36 +524,42 @@ export type Database = {
       }
       reading_plans: {
         Row: {
+          body_html: string | null
           category: string
           created_at: string
           duration_days: number
           excerpt: string
           featured: boolean
           id: string
+          image_url: string | null
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at: string
         }
         Insert: {
+          body_html?: string | null
           category: string
           created_at?: string
           duration_days: number
           excerpt: string
           featured?: boolean
           id?: string
+          image_url?: string | null
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           title: string
           updated_at?: string
         }
         Update: {
+          body_html?: string | null
           category?: string
           created_at?: string
           duration_days?: number
           excerpt?: string
           featured?: boolean
           id?: string
+          image_url?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           title?: string

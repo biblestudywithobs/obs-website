@@ -34,6 +34,8 @@ export type ReadingPlanDetail = {
   category: string;
   durationDays: number;
   excerpt: string;
+  bodyHtml: string;
+  imageUrl: string | null;
   featured: boolean;
   status: Enums<"content_status">;
 };
@@ -42,7 +44,9 @@ export async function getReadingPlanById(id: string): Promise<ReadingPlanDetail 
   const supabase = await createClient();
   const { data } = await supabase
     .from("reading_plans")
-    .select("id, slug, title, category, duration_days, excerpt, featured, status")
+    .select(
+      "id, slug, title, category, duration_days, excerpt, body_html, image_url, featured, status",
+    )
     .eq("id", id)
     .single();
 
@@ -54,6 +58,8 @@ export async function getReadingPlanById(id: string): Promise<ReadingPlanDetail 
     category: data.category,
     durationDays: data.duration_days,
     excerpt: data.excerpt,
+    bodyHtml: data.body_html ?? "",
+    imageUrl: data.image_url,
     featured: data.featured,
     status: data.status,
   };

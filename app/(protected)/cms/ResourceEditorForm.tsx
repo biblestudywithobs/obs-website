@@ -7,7 +7,7 @@ import {
   type SaveResourceState,
 } from "@/lib/actions/admin-resources";
 import type { ResourceDetail, AuthorOption } from "@/lib/queries/admin-resources";
-import { RichTextEditor } from "./RichTextEditor";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { FileUploadField } from "@/components/admin/FileUploadField";
 
 const CATEGORIES = ["Articles", "Bible Studies", "Manuals", "Devotionals", "Downloads"] as const;

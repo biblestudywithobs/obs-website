@@ -10,7 +10,7 @@ import type { Database } from "@/types/database";
 export async function uploadPublicFile(
   supabase: SupabaseClient<Database>,
   file: File,
-  folder: "events" | "content",
+  folder: "events" | "content" | "reading-plans",
 ): Promise<{ url: string | null; error: string | null }> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `${folder}/${crypto.randomUUID()}.${ext}`;

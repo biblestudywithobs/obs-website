@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
+import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { uploadPublicFile } from "@/lib/storage";
 import type { Enums } from "@/types/database";
 
 export type SaveReadingPlanState = { error: string | null };
@@ -23,6 +25,8 @@ export async function saveReadingPlan(
   const excerpt = String(formData.get("excerpt") ?? "").trim();
   const status = String(formData.get("status") ?? "draft") as Enums<"content_status">;
   const featured = formData.get("featured") === "on";
+  const rawBodyHtml = String(formData.get("bodyHtml") ?? "").trim();
+  const bodyHtml = rawBodyHtml ? sanitizeArticleHtml(rawBodyHtml) : null;
 
   if (!title || !category || !excerpt || !durationDays) {
     return { error: "Title, category, duration, and excerpt are required." };
@@ -31,17 +35,27 @@ export async function saveReadingPlan(
   let slug = String(formData.get("slug") ?? "").trim();
   if (!slug) slug = slugify(title);
 
+  const supabase = await createClient();
+
+  let imageUrl = String(formData.get("existingImageUrl") ?? "").trim() || null;
+  const image = formData.get("image");
+  if (image instanceof File && image.size > 0) {
+    const { url, error } = await uploadPublicFile(supabase, image, "reading-plans");
+    if (error) return { error: `Image upload failed: ${error}` };
+    imageUrl = url;
+  }
+
   const payload = {
     slug,
     title,
     category,
     duration_days: durationDays,
     excerpt,
+    body_html: bodyHtml,
+    image_url: imageUrl,
     featured,
     status,
   };
-
-  const supabase = await createClient();
 
   if (id) {
     const { error } = await supabase.from("reading_plans").update(payload).eq("id", id);
