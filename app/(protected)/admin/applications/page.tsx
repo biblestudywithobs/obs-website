@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { ApplicationsList } from "@/components/admin/ApplicationsList";
+import { ExportCsvButton } from "@/components/admin/ExportCsvButton";
 import { requireRole } from "@/lib/auth";
 import { EDITOR_TIER_ROLES } from "@/types/staff";
 import { createClient } from "@/lib/supabase/server";
@@ -80,6 +82,15 @@ export default async function ApplicationsPage({
   const heroLabel = activeArea === "all" ? "Total applications" : `${areaLabels[activeArea]}`;
   const heroValue = activeArea === "all" ? applications.length : (areaCounts.get(activeArea) ?? 0);
 
+  const exportFilename = [
+    "applications",
+    activeArea === "all" ? "all" : activeArea,
+    activeRole?.toLowerCase().replace(/\s+/g, "-"),
+  ]
+    .filter(Boolean)
+    .join("-")
+    .concat(".csv");
+
   return (
     <div className="flex min-h-screen max-[780px]:flex-col">
       <AdminSidebar
@@ -91,6 +102,11 @@ export default async function ApplicationsPage({
       <main className="min-w-0 flex-1">
         <div className="border-line bg-paper sticky top-0 z-10 flex h-[72px] items-center justify-between border-b px-8 max-[780px]:px-5">
           <h1 className="font-display text-[20px] font-semibold">Applications</h1>
+          <ExportCsvButton
+            applications={visible}
+            areaLabels={areaLabels}
+            filename={exportFilename}
+          />
         </div>
 
         <div className="max-w-[1000px] p-8 max-[780px]:p-5">
@@ -221,62 +237,7 @@ export default async function ApplicationsPage({
           {visible.length === 0 ? (
             <p className="text-ink-muted text-[14px]">No applications yet.</p>
           ) : (
-            <div className="flex flex-col gap-3.5">
-              {visible.map((app) => {
-                const applicantLocation = [app.state, app.country].filter(Boolean).join(", ");
-                const detail = [
-                  app.role_detail,
-                  app.location,
-                  app.gender,
-                  app.hours_per_week,
-                  applicantLocation,
-                  app.church && `Church: ${app.church}`,
-                  app.workforce && `Workforce: ${app.workforce}`,
-                  app.bible_study_rating && `Bible study/prayer life: ${app.bible_study_rating}`,
-                  app.read_articles && `Read our articles: ${app.read_articles}`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ");
-                return (
-                  <div
-                    key={app.id}
-                    className="border-line bg-paper rounded-[16px] border px-6 py-5"
-                  >
-                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-display text-[16.5px] font-semibold">{app.name}</h3>
-                      <span className="bg-cream text-gold-deep rounded-full px-[11px] py-[5px] text-[11px] font-bold tracking-[0.04em] uppercase">
-                        {areaLabels[app.area] ?? app.area}
-                      </span>
-                    </div>
-                    {detail && (
-                      <div className="text-ink-muted mb-2 text-[13px] font-semibold">{detail}</div>
-                    )}
-                    <div className="text-ink-muted mb-2 flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
-                      <a href={`mailto:${app.email}`} className="hover:text-ink">
-                        {app.email}
-                      </a>
-                      {app.phone && (
-                        <a href={`tel:${app.phone}`} className="hover:text-ink">
-                          {app.phone}
-                        </a>
-                      )}
-                      <span>
-                        {new Date(app.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    {app.message && (
-                      <p className="font-reading text-ink-muted mt-2 max-w-[70ch] text-[14px] leading-[1.6]">
-                        {app.message}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <ApplicationsList applications={visible} areaLabels={areaLabels} />
           )}
         </div>
       </main>
