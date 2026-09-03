@@ -136,7 +136,6 @@ export async function saveReadingPlan(
   // could otherwise keep serving its old cached response.
   revalidatePath("/reading-plans");
   revalidatePath(`/reading-plans/${slug}`);
-  revalidatePath("/");
 
   redirect("/admin/reading-plans");
 }
@@ -147,7 +146,6 @@ export async function deleteReadingPlan(id: string) {
   const { data: existing } = await supabase.from("reading_plans").select("slug").eq("id", id).single();
   await supabase.from("reading_plans").delete().eq("id", id);
   revalidatePath("/reading-plans");
-  revalidatePath("/");
   if (existing) revalidatePath(`/reading-plans/${existing.slug}`);
   redirect("/admin/reading-plans");
 }
@@ -162,7 +160,6 @@ export async function bulkDeleteReadingPlans(ids: string[]) {
   await supabase.from("reading_plans").delete().in("id", ids);
   revalidatePath("/admin/reading-plans");
   revalidatePath("/reading-plans");
-  revalidatePath("/");
   for (const p of existing ?? []) revalidatePath(`/reading-plans/${p.slug}`);
 }
 

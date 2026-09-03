@@ -82,7 +82,6 @@ export async function saveResource(
   // Public pages are statically cached (see lib/supabase/public.ts) — bust
   // them on every save so a publish/edit shows up immediately.
   revalidatePath("/resources");
-  revalidatePath("/");
   if (category === "Articles") revalidatePath(`/articles/${slug}`);
 
   redirect("/cms");
@@ -94,7 +93,6 @@ export async function deleteResource(id: string) {
   const { data: existing } = await supabase.from("resources").select("slug").eq("id", id).single();
   await supabase.from("resources").delete().eq("id", id);
   revalidatePath("/resources");
-  revalidatePath("/");
   if (existing) revalidatePath(`/articles/${existing.slug}`);
   redirect("/cms");
 }
@@ -109,6 +107,5 @@ export async function bulkDeleteResources(ids: string[]) {
   await supabase.from("resources").delete().in("id", ids);
   revalidatePath("/cms");
   revalidatePath("/resources");
-  revalidatePath("/");
   for (const r of existing ?? []) revalidatePath(`/articles/${r.slug}`);
 }

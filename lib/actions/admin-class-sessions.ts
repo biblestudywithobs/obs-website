@@ -73,7 +73,6 @@ export async function saveClassSession(
   // Public pages are statically cached (see lib/supabase/public.ts) — bust
   // them on every save so a publish/edit shows up immediately.
   revalidatePath("/sessions");
-  revalidatePath("/");
 
   redirect("/admin/class-sessions");
 }
@@ -83,7 +82,6 @@ export async function deleteClassSession(id: string) {
   const supabase = await createClient();
   await supabase.from("class_sessions").delete().eq("id", id);
   revalidatePath("/sessions");
-  revalidatePath("/");
   redirect("/admin/class-sessions");
 }
 
@@ -94,5 +92,4 @@ export async function bulkDeleteClassSessions(ids: string[]) {
   await supabase.from("class_sessions").delete().in("id", ids);
   revalidatePath("/admin/class-sessions");
   revalidatePath("/sessions");
-  revalidatePath("/");
 }
