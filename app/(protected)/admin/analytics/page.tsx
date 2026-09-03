@@ -1,13 +1,24 @@
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { requireProfile } from "@/lib/auth";
 import { getAnalyticsOverview } from "@/lib/queries/admin-analytics";
 
-export default async function AnalyticsPage() {
+const RANGES = ["all", "monthly"] as const;
+type Range = (typeof RANGES)[number];
+const rangeLabels: Record<Range, string> = { all: "All time", monthly: "Monthly" };
+
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
   const profile = await requireProfile();
+  const params = await searchParams;
+  const range: Range = params.range === "monthly" ? "monthly" : "all";
   const data = await getAnalyticsOverview();
 
-  const maxDaily = Math.max(1, ...data.dailyCounts.map((d) => d.views));
+  const maxMonthly = Math.max(1, ...data.monthlyCounts.map((m) => m.views));
   const maxPageViews = Math.max(1, ...data.topPages.map((p) => p.views));
 
   return (
@@ -68,22 +79,49 @@ export default async function AnalyticsPage() {
 
               <div className="grid grid-cols-[1.3fr_1fr] gap-5 max-[900px]:grid-cols-1">
                 <div className="border-line bg-paper rounded-[16px] border px-6 py-[22px]">
-                  <h3 className="font-display mb-5 text-[16px] font-semibold">
-                    Pageviews, last 14 days
-                  </h3>
-                  {data.dailyCounts.length === 0 ? (
+                  <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="font-display text-[16px] font-semibold">Pageviews</h3>
+                    <div className="bg-cream inline-flex rounded-full p-1">
+                      {RANGES.map((r) => (
+                        <Link
+                          key={r}
+                          href={r === "all" ? "/admin/analytics" : `/admin/analytics?range=${r}`}
+                          className={cn(
+                            "font-ui rounded-full px-4 py-1.5 text-[12.5px] font-semibold transition-colors",
+                            range === r ? "bg-gold text-ink" : "text-ink-muted hover:text-ink",
+                          )}
+                        >
+                          {rangeLabels[r]}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {range === "all" ? (
+                    <div>
+                      <div className="font-display text-[40px] font-semibold">
+                        {data.allTimePageviews.toLocaleString()}
+                      </div>
+                      <p className="text-ink-muted mt-1.5 text-[12.5px] font-medium">
+                        Total pageviews all time
+                      </p>
+                    </div>
+                  ) : data.monthlyCounts.length === 0 ? (
                     <p className="text-ink-muted text-[13px]">Not enough data yet.</p>
                   ) : (
-                    <div className="flex h-[140px] items-end gap-1.5">
-                      {data.dailyCounts.map((d) => (
-                        <div key={d.day} className="flex flex-1 flex-col items-center gap-1.5">
+                    <div className="flex h-[170px] items-end gap-2.5">
+                      {data.monthlyCounts.map((m) => (
+                        <div key={m.month} className="flex flex-1 flex-col items-center gap-1.5">
+                          <span className="text-ink text-[11.5px] font-bold">
+                            {m.views.toLocaleString()}
+                          </span>
                           <div
                             className="bg-gold w-full rounded-[3px]"
-                            style={{ height: `${Math.max(4, (d.views / maxDaily) * 120)}px` }}
-                            title={`${d.day}: ${d.views}`}
+                            style={{ height: `${Math.max(4, (m.views / maxMonthly) * 120)}px` }}
+                            title={`${m.month}: ${m.views}`}
                           />
                           <span className="text-ink-muted text-[9.5px]">
-                            {new Date(d.day).toLocaleDateString("en-US", { day: "numeric" })}
+                            {new Date(m.month).toLocaleDateString("en-US", { month: "short" })}
                           </span>
                         </div>
                       ))}
