@@ -4,6 +4,9 @@ import { SessionLibrary } from "@/components/sections/SessionLibrary";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { listPublishedSessions } from "@/lib/queries/public-sessions";
 
+// Statically rendered/ISR'd — see app/(marketing)/page.tsx for why.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Class Sessions — Open Bible School",
   description:

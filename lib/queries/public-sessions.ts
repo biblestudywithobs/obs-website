@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Session } from "@/types/content";
 
 type SessionRow = {
@@ -28,7 +28,7 @@ function toSession(row: SessionRow): Session {
 // Homepage "Missed a class?" carousel — most recently recorded published
 // sessions.
 export async function listRecentSessions(limit = 5): Promise<Session[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("class_sessions")
     .select("slug, series, duration_label, title, teacher, recorded_at, waveform, video_url")
@@ -46,7 +46,7 @@ export async function listPublishedSessions(): Promise<{
   sessions: Session[];
   seriesList: string[];
 }> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("class_sessions")
     .select("slug, series, duration_label, title, teacher, recorded_at, waveform, video_url")

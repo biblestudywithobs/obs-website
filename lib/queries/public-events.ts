@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export type PublicEvent = {
   slug: string;
@@ -37,7 +37,7 @@ export async function listPublishedEvents(): Promise<{
   upcoming: PublicEvent[];
   past: PublicEvent[];
 }> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const nowIso = new Date().toISOString();
 
   const [{ data: upcomingRows }, { data: pastRows }] = await Promise.all([
@@ -64,7 +64,7 @@ export async function listPublishedEvents(): Promise<{
 // Real calendar cells for the month of `reference` (defaults to today),
 // with a dot on any day that has a published event.
 export async function getEventCalendar(reference: Date = new Date()) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const year = reference.getFullYear();
   const month = reference.getMonth();
   const monthStart = new Date(year, month, 1);

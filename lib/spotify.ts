@@ -10,14 +10,15 @@ export type SpotifyEpisode = {
   releaseDate: string;
 };
 
-let cachedToken: { value: string; expiresAt: number } | null = null;
-
 // Client Credentials flow — this only ever reads public show/episode data,
-// no user auth involved, so a single app-level token (cached until it's
-// close to expiry) is all that's needed.
+// no user auth involved, so a single app-level token (reused until close to
+// expiry) is all that's needed. Cached via Next's fetch Data Cache rather
+// than a module-level variable: on serverless (Netlify Functions), each
+// cold invocation gets a fresh module scope, so an in-memory cache is a
+// no-op most of the time and this endpoint was being re-hit on every cold
+// start — the Data Cache persists across invocations and actually saves
+// the round trip.
 async function getAccessToken(): Promise<string | null> {
-  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.value;
-
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
   if (!clientId || !clientSecret) return null;
@@ -29,13 +30,14 @@ async function getAccessToken(): Promise<string | null> {
       Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
     },
     body: "grant_type=client_credentials",
-    cache: "no-store",
+    // Spotify client-credentials tokens are valid for 3600s — cache just
+    // under that so a fresh one is fetched before the old one expires.
+    next: { revalidate: 3300 },
   });
   if (!res.ok) return null;
 
   const data = await res.json();
-  cachedToken = { value: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
-  return cachedToken.value;
+  return data.access_token as string;
 }
 
 // Returns [] (rather than throwing) if Spotify isn't configured yet or the

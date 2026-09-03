@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { sanitizeArticleHtml } from "@/lib/sanitize-html";
 import { staffRoleLabels } from "@/types/staff";
 import { getSubstackArticles } from "@/lib/substack";
@@ -17,7 +17,7 @@ function stripHtml(html: string): string {
 // the original 3-column asymmetric layout regardless of how many pieces are
 // marked featured.
 export async function listFeaturedResources(): Promise<Resource[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("resources")
     .select("slug, title, excerpt, tag, meta_label")
@@ -41,7 +41,7 @@ export async function listFeaturedResources(): Promise<Resource[]> {
 // link, real cover art) — same live-feed approach as Media's Spotify/
 // Substack merge.
 export async function listLibraryResources(): Promise<LibraryResource[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const [{ data }, substackArticles] = await Promise.all([
     supabase
       .from("resources")
@@ -75,6 +75,20 @@ export async function listLibraryResources(): Promise<LibraryResource[]> {
   return [...cmsResources, ...substackResources];
 }
 
+// Slugs for every published Article — feeds generateStaticParams() on
+// /articles/[slug] so each piece is prerendered at build time instead of on
+// each visitor's first cold hit.
+export async function listPublishedArticleSlugs(): Promise<string[]> {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("resources")
+    .select("slug")
+    .eq("status", "published")
+    .eq("category", "Articles");
+
+  return (data ?? []).map((r) => r.slug);
+}
+
 export type ArticleDetail = {
   slug: string;
   tag: string;
@@ -100,7 +114,7 @@ function initialsFrom(name: string): string {
 }
 
 export async function getPublishedResourceBySlug(slug: string): Promise<ArticleDetail | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("resources")
     .select(

@@ -6,6 +6,9 @@ import {
   listPublishedReadingPlans,
 } from "@/lib/queries/public-reading-plans";
 
+// Statically rendered/ISR'd — see app/(marketing)/page.tsx for why.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Reading Plans — Open Bible School",
   description:

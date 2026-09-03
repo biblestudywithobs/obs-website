@@ -12,6 +12,12 @@ import { listFeaturedResources } from "@/lib/queries/public-resources";
 import { getLatestByTab } from "@/lib/queries/homepage-latest";
 import { listRecentSessions } from "@/lib/queries/public-sessions";
 
+// Statically rendered/ISR'd — the Supabase queries below use the anon,
+// cookie-free client so this doesn't force full per-request dynamic
+// rendering. Admin actions call revalidatePath("/") on publish, so this
+// interval is just a safety net.
+export const revalidate = 3600;
+
 // Inline arrow used by "view all" style links.
 function ArrowRight() {
   return (

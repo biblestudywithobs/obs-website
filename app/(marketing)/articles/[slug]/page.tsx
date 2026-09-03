@@ -3,7 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { ShareButton } from "@/components/ui/ShareButton";
-import { getPublishedResourceBySlug } from "@/lib/queries/public-resources";
+import {
+  getPublishedResourceBySlug,
+  listPublishedArticleSlugs,
+} from "@/lib/queries/public-resources";
+
+// Statically rendered/ISR'd — see app/(marketing)/page.tsx for why.
+export const revalidate = 3600;
+
+// Prerenders every published article at build time, rather than leaving
+// each one to be rendered (and cached) on its first visitor's cold hit.
+export async function generateStaticParams() {
+  const slugs = await listPublishedArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({
   params,

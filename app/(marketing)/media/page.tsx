@@ -4,6 +4,11 @@ import { MinimalFooter } from "@/components/layout/MinimalFooter";
 import { listMediaItems } from "@/lib/queries/public-media";
 import { MediaView } from "./MediaView";
 
+// Statically rendered/ISR'd — Spotify/Substack fetches inside
+// listMediaItems() are already cached (next.revalidate), this bounds the
+// page-level cache too.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Podcast & Media — Open Bible School",
   description:

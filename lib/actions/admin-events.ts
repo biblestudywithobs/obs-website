@@ -60,6 +60,11 @@ export async function saveEvent(
     if (error) return { error: error.message };
   }
 
+  // Public pages are statically cached (see lib/supabase/public.ts) — bust
+  // them on every save so a publish/edit shows up immediately.
+  revalidatePath("/events");
+  revalidatePath("/");
+
   redirect("/admin/events");
 }
 
@@ -67,6 +72,8 @@ export async function deleteEvent(id: string) {
   await requireRole(EDITOR_TIER_ROLES);
   const supabase = await createClient();
   await supabase.from("events").delete().eq("id", id);
+  revalidatePath("/events");
+  revalidatePath("/");
   redirect("/admin/events");
 }
 
@@ -78,4 +85,6 @@ export async function bulkDeleteEvents(ids: string[]) {
   const supabase = await createClient();
   await supabase.from("events").delete().in("id", ids);
   revalidatePath("/admin/events");
+  revalidatePath("/events");
+  revalidatePath("/");
 }

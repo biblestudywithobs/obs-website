@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { listMediaItems } from "@/lib/queries/public-media";
 import type { LatestItem } from "@/types/content";
 
@@ -9,7 +9,7 @@ export type LatestTab = (typeof LATEST_TABS)[number];
 // replaces the old hardcoded lib/data/latest.ts, where every tab showed the
 // same 3 fake articles regardless of which was selected.
 export async function getLatestByTab(): Promise<Record<LatestTab, LatestItem[]>> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const [{ data: articleRows }, { data: planRows }, { data: eventRows }, mediaItems] =
     await Promise.all([
