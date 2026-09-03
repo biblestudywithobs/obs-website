@@ -2,5 +2,5 @@
 // session + role check here (redirecting unauthenticated/under-privileged
 // requests) backed by Supabase Auth + RLS.
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <div className="admin-theme">{children}</div>;
 }

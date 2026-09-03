@@ -4,11 +4,14 @@ import { useActionState, useRef, useState } from "react";
 import {
   saveReadingPlan,
   deleteReadingPlan,
+  regeneratePreviewToken,
   type SaveReadingPlanState,
 } from "@/lib/actions/admin-reading-plans";
-import type { ReadingPlanDetail } from "@/lib/queries/admin-reading-plans";
+import type { ReadingPlanDetail, ReadingPlanDayDraft } from "@/lib/queries/admin-reading-plans";
 import { ReadingPlanPreviewModal } from "@/components/admin/ReadingPlanPreviewModal";
+import { ReadingPlanDayEditor } from "@/components/admin/ReadingPlanDayEditor";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { cn } from "@/lib/cn";
 
 const CATEGORIES = ["Beginner", "Topical", "Book Study", "Devotional"] as const;
 const STATUSES = ["draft", "in_review", "published"] as const;
@@ -17,6 +20,10 @@ const statusLabels: Record<string, string> = {
   in_review: "In review",
   published: "Published",
 };
+const PLAN_TYPES = [
+  { value: "reading_plan", label: "Reading Plan" },
+  { value: "commentary", label: "Commentary" },
+] as const;
 
 const initialState: SaveReadingPlanState = { error: null };
 
@@ -32,17 +39,86 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
   const [excerpt, setExcerpt] = useState(plan?.excerpt ?? "");
   const [featured, setFeatured] = useState(plan?.featured ?? false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(plan?.imageUrl ?? "");
+  const [planType, setPlanType] = useState<"reading_plan" | "commentary">(
+    plan?.planType ?? "reading_plan",
+  );
+  const [dayCount, setDayCount] = useState(() =>
+    plan?.planType === "commentary" ? Math.max(plan.days.length, plan.durationDays, 1) : 1,
+  );
   const [showPreview, setShowPreview] = useState(false);
   const [previewBodyHtml, setPreviewBodyHtml] = useState("");
+  const [previewDays, setPreviewDays] = useState<ReadingPlanDayDraft[]>([]);
+  const [previewToken, setPreviewToken] = useState(plan?.previewToken ?? "");
+  const [copied, setCopied] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
-  // RichTextEditor keeps its own Tiptap state and only syncs out to a hidden
-  // <input name="bodyHtml">, so the freshest value lives in the DOM, not in
-  // this component's React state — read it straight off the form at the
-  // moment Preview is clicked rather than trying to mirror every keystroke.
+  const daysByNumber = new Map(plan?.days.map((d) => [d.dayNumber, d]));
+
+  function handleDurationChange(value: number | "") {
+    setDurationDays(value);
+    if (planType === "commentary" && value !== "") {
+      setDayCount(Math.max(1, value));
+    }
+  }
+
+  function handlePlanTypeChange(next: "reading_plan" | "commentary") {
+    setPlanType(next);
+    if (next === "commentary" && durationDays !== "") {
+      setDayCount(Math.max(1, durationDays));
+    }
+  }
+
+  // RichTextEditor keeps its own Tiptap state and only syncs out to hidden
+  // <input>s, so the freshest value lives in the DOM, not in this
+  // component's React state — read it straight off the form at the moment
+  // Preview is clicked rather than trying to mirror every keystroke.
   function openPreview() {
-    const input = formRef.current?.elements.namedItem("bodyHtml") as HTMLInputElement | null;
-    setPreviewBodyHtml(input?.value ?? "");
+    const form = formRef.current;
+    const bodyInput = form?.elements.namedItem("bodyHtml") as HTMLInputElement | null;
+    setPreviewBodyHtml(bodyInput?.value ?? "");
+
+    const days: ReadingPlanDayDraft[] = [];
+    for (let i = 0; i < dayCount; i++) {
+      const titleInput = form?.elements.namedItem(`day_title_${i}`) as HTMLInputElement | null;
+      const passageInput = form?.elements.namedItem(`day_passageRef_${i}`) as HTMLInputElement | null;
+      const contentInput = form?.elements.namedItem(`day_content_${i}`) as HTMLInputElement | null;
+      days.push({
+        id: null,
+        dayNumber: i + 1,
+        title: titleInput?.value || `Day ${i + 1}`,
+        passageRef: passageInput?.value ?? "",
+        content: contentInput?.value ?? "",
+      });
+    }
+    setPreviewDays(days);
     setShowPreview(true);
+  }
+
+  async function copyPreviewLink() {
+    await navigator.clipboard.writeText(
+      `${window.location.origin}/reading-plans/preview/${previewToken}`,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  // Invalidates the current link (anyone holding the old one gets a 404)
+  // and copies the new one — for when a draft link was shared too widely.
+  async function regenerateAndCopy() {
+    if (!plan) return;
+    setRegenerating(true);
+    const result = await regeneratePreviewToken(plan.id);
+    setRegenerating(false);
+    if ("error" in result) {
+      alert(`Couldn't regenerate the link: ${result.error}`);
+      return;
+    }
+    setPreviewToken(result.token);
+    await navigator.clipboard.writeText(
+      `${window.location.origin}/reading-plans/preview/${result.token}`,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -53,6 +129,7 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
         className="max-w-[720px] min-[1200px]:max-w-[860px] min-[1600px]:max-w-[980px]"
       >
         {plan && <input type="hidden" name="id" value={plan.id} />}
+        <input type="hidden" name="planType" value={planType} />
 
         {state.error && (
           <div className="border-oxblood/30 bg-oxblood/10 text-oxblood mb-5 rounded-[10px] border px-3.5 py-3 text-[13px]">
@@ -62,22 +139,59 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
 
         {/* Substack-style compose toolbar: preview on the left, save/publish
             actions on the right, sitting above a large borderless title. */}
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={openPreview}
-            className="border-line hover:border-gold-deep font-ui flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
-          >
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6-8.5-6-8.5-6Z"
-                stroke="#2B2420"
-                strokeWidth="1.4"
-              />
-              <circle cx="10" cy="10" r="2.5" stroke="#2B2420" strokeWidth="1.4" />
-            </svg>
-            Preview
-          </button>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={openPreview}
+              className="border-line hover:border-gold-deep font-ui flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                <path
+                  d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6-8.5-6-8.5-6Z"
+                  stroke="#2B2420"
+                  strokeWidth="1.4"
+                />
+                <circle cx="10" cy="10" r="2.5" stroke="#2B2420" strokeWidth="1.4" />
+              </svg>
+              Preview
+            </button>
+
+            {plan && (
+              <button
+                type="button"
+                onClick={copyPreviewLink}
+                className="border-line hover:border-gold-deep font-ui relative flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M8 12a3.5 3.5 0 0 0 5 0l2-2a3.5 3.5 0 1 0-5-5l-.5.5M12 8a3.5 3.5 0 0 0-5 0l-2 2a3.5 3.5 0 1 0 5 5l.5-.5"
+                    stroke="#2B2420"
+                    strokeWidth="1.4"
+                  />
+                </svg>
+                Copy preview link
+                {copied && (
+                  <span className="bg-ink text-cream absolute -top-9 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[11px] font-semibold whitespace-nowrap">
+                    Link copied
+                  </span>
+                )}
+              </button>
+            )}
+            {plan && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("Regenerate the preview link? The old link will stop working."))
+                    regenerateAndCopy();
+                }}
+                disabled={regenerating}
+                className="text-ink-muted hover:text-ink font-ui text-[12px] font-medium underline decoration-dotted disabled:opacity-60"
+              >
+                Regenerate
+              </button>
+            )}
+          </div>
 
           <div className="flex items-center gap-3">
             <button
@@ -104,6 +218,24 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
           </div>
         </div>
 
+        {/* Reading Plan vs Commentary — picks single long-form content vs a
+            day-by-day breakdown below. */}
+        <div className="bg-cream mb-8 inline-flex rounded-full p-1">
+          {PLAN_TYPES.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => handlePlanTypeChange(t.value)}
+              className={cn(
+                "font-ui rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors",
+                planType === t.value ? "bg-gold text-ink" : "text-ink-muted hover:text-ink",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         {/* Big borderless title, matching a Substack/Medium compose surface */}
         <input
           type="text"
@@ -111,7 +243,7 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          placeholder="Reading plan title…"
+          placeholder={planType === "commentary" ? "Commentary title…" : "Reading plan title…"}
           className="font-display placeholder:text-ink-muted/40 mb-3 w-full bg-transparent text-[34px] leading-[1.2] font-semibold focus:outline-none"
         />
 
@@ -146,7 +278,9 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
               name="durationDays"
               min={1}
               value={durationDays}
-              onChange={(e) => setDurationDays(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) =>
+                handleDurationChange(e.target.value === "" ? "" : Number(e.target.value))
+              }
               required
               className="w-10 bg-transparent text-right focus:outline-none"
             />
@@ -193,12 +327,25 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
           </div>
         </div>
 
-        {/* The plan's actual content — this site's reading plans are
-            single long-form pieces (article/commentary style), not broken
-            into days like YouVersion's own plans. */}
-        <div className="mb-8">
-          <RichTextEditor name="bodyHtml" initialHtml={plan?.bodyHtml ?? ""} />
-        </div>
+        {/* Reading Plan: one long-form piece. Commentary: a day-by-day
+            breakdown, day count driven by the "days" field above. */}
+        {planType === "reading_plan" ? (
+          <div className="mb-8">
+            <RichTextEditor name="bodyHtml" initialHtml={plan?.bodyHtml ?? ""} />
+          </div>
+        ) : (
+          <div className="mb-8">
+            <input type="hidden" name="dayCount" value={dayCount} />
+            {Array.from({ length: dayCount }, (_, i) => i + 1).map((dayNumber) => (
+              <ReadingPlanDayEditor
+                key={dayNumber}
+                dayNumber={dayNumber}
+                day={daysByNumber.get(dayNumber)}
+                defaultOpen={dayNumber === 1}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Publishing settings — de-emphasized, everything an editor needs
             before publishing but not competing with the writing surface. */}
@@ -244,6 +391,8 @@ export function ReadingPlanEditorForm({ plan }: { plan: ReadingPlanDetail | null
           bodyHtml={previewBodyHtml}
           imageUrl={imagePreviewUrl}
           featured={featured}
+          planType={planType}
+          days={previewDays}
           onClose={() => setShowPreview(false)}
         />
       )}

@@ -57,6 +57,11 @@ export default async function AdminReadingPlansPage() {
                             Featured
                           </span>
                         )}
+                        {p.planType === "commentary" && (
+                          <span className="border-line text-ink-muted shrink-0 rounded-full border px-2 py-[2px] text-[10px] font-bold uppercase">
+                            Commentary
+                          </span>
+                        )}
                       </div>
                       <div className="text-ink-muted mt-0.5 text-[12.5px]">
                         {p.category} · {p.durationDays} days

@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeArticleHtml } from "@/lib/sanitize-html";
-import type { ReadingPlan } from "@/types/content";
+import type { ReadingPlan, ReadingPlanDay } from "@/types/content";
 
 export type FeaturedPlan = {
   slug: string;
@@ -15,7 +16,7 @@ export type FeaturedPlan = {
 // none is marked (the block just doesn't render, rather than showing
 // invented copy).
 export async function getFeaturedReadingPlan(): Promise<FeaturedPlan | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("reading_plans")
     .select("slug, title, excerpt, duration_days, image_url")
@@ -43,10 +44,10 @@ export async function getFeaturedReadingPlan(): Promise<FeaturedPlan | null> {
 export async function listPublishedReadingPlans(
   excludeSlug?: string,
 ): Promise<{ plans: ReadingPlan[]; categories: string[] }> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("reading_plans")
-    .select("slug, category, duration_days, title, excerpt, image_url")
+    .select("slug, category, duration_days, title, excerpt, image_url, plan_type")
     .eq("status", "published")
     .order("updated_at", { ascending: false });
 
@@ -61,9 +62,19 @@ export async function listPublishedReadingPlans(
       title: p.title,
       excerpt: p.excerpt,
       imageUrl: p.image_url,
+      planType: p.plan_type,
     })),
     categories,
   };
+}
+
+// Slugs for every published plan — feeds generateStaticParams() on
+// /reading-plans/[slug] so each one is prerendered at build time instead of
+// on each visitor's first cold hit.
+export async function listPublishedReadingPlanSlugs(): Promise<string[]> {
+  const supabase = createPublicClient();
+  const { data } = await supabase.from("reading_plans").select("slug").eq("status", "published");
+  return (data ?? []).map((p) => p.slug);
 }
 
 export type ReadingPlanArticle = {
@@ -75,20 +86,45 @@ export type ReadingPlanArticle = {
   bodyHtml: string;
   imageUrl: string | null;
   updated: string;
+  planType: "reading_plan" | "commentary";
+  status: "draft" | "in_review" | "published";
+  days: ReadingPlanDay[];
 };
+
+async function fetchDays(
+  supabase: ReturnType<typeof createPublicClient> | ReturnType<typeof createAdminClient>,
+  planId: string,
+): Promise<ReadingPlanDay[]> {
+  const { data } = await supabase
+    .from("reading_plan_days")
+    .select("day_number, title, passage_ref, content")
+    .eq("plan_id", planId)
+    .order("day_number", { ascending: true });
+
+  return (data ?? []).map((d) => ({
+    dayNumber: d.day_number,
+    title: d.title,
+    passageRef: d.passage_ref ?? "",
+    contentHtml: d.content ? sanitizeArticleHtml(d.content) : "",
+  }));
+}
 
 export async function getPublishedReadingPlanBySlug(
   slug: string,
 ): Promise<ReadingPlanArticle | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("reading_plans")
-    .select("slug, title, category, duration_days, excerpt, body_html, image_url, updated_at")
+    .select(
+      "id, slug, title, category, duration_days, excerpt, body_html, image_url, updated_at, plan_type, status",
+    )
     .eq("slug", slug)
     .eq("status", "published")
     .single();
 
   if (!data) return null;
+
+  const days = data.plan_type === "commentary" ? await fetchDays(supabase, data.id) : [];
 
   return {
     slug: data.slug,
@@ -102,5 +138,47 @@ export async function getPublishedReadingPlanBySlug(
       month: "short",
       day: "numeric",
     })}`,
+    planType: data.plan_type,
+    status: data.status,
+    days,
+  };
+}
+
+// Draft-preview lookup by capability token — bypasses RLS via the
+// service-role client since a draft/in-review plan is invisible to anon
+// under the normal `status = 'published'` policy. Security relies entirely
+// on the token being unguessable and this being an exact single-row match,
+// never a listing — guard every call site accordingly.
+export async function getReadingPlanByPreviewToken(
+  token: string,
+): Promise<ReadingPlanArticle | null> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("reading_plans")
+    .select(
+      "id, slug, title, category, duration_days, excerpt, body_html, image_url, updated_at, plan_type, status",
+    )
+    .eq("preview_token", token)
+    .single();
+
+  if (!data) return null;
+
+  const days = data.plan_type === "commentary" ? await fetchDays(supabase, data.id) : [];
+
+  return {
+    slug: data.slug,
+    title: data.title,
+    category: data.category,
+    duration: `${data.duration_days} day${data.duration_days === 1 ? "" : "s"}`,
+    excerpt: data.excerpt,
+    bodyHtml: data.body_html ? sanitizeArticleHtml(data.body_html) : "",
+    imageUrl: data.image_url,
+    updated: `Updated ${new Date(data.updated_at).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    })}`,
+    planType: data.plan_type,
+    status: data.status,
+    days,
   };
 }

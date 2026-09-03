@@ -57,7 +57,7 @@
   }
 
   body {
-    background: var(--color-paper);
+    background: #fff;
     color: var(--color-ink);
     font-family: var(--font-ui);
     -webkit-font-smoothing: antialiased;
@@ -99,6 +99,17 @@
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
     }
+  }
+
+  /* Admin/CMS portal (app/(protected)/layout.tsx wraps every /admin and /cms
+     page in this) — swaps the warm tan surface tokens for a clean white
+     dashboard look. Gold/oxblood/ink/line stay untouched, so buttons, status
+     pills, and borders keep the same brand identity; every bg-paper/bg-cream
+     usage across the portal picks this up automatically since Tailwind's
+     utilities reference these as CSS custom properties. */
+  .admin-theme {
+    --color-paper: #ffffff;
+    --color-cream: #faf7ef;
   }
 }
 

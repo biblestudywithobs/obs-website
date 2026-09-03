@@ -492,7 +492,7 @@ export type Database = {
           content: string | null
           day_number: number
           id: string
-          passage_ref: string
+          passage_ref: string | null
           plan_id: string
           title: string
         }
@@ -500,7 +500,7 @@ export type Database = {
           content?: string | null
           day_number: number
           id?: string
-          passage_ref: string
+          passage_ref?: string | null
           plan_id: string
           title: string
         }
@@ -508,7 +508,7 @@ export type Database = {
           content?: string | null
           day_number?: number
           id?: string
-          passage_ref?: string
+          passage_ref?: string | null
           plan_id?: string
           title?: string
         }
@@ -532,6 +532,8 @@ export type Database = {
           featured: boolean
           id: string
           image_url: string | null
+          plan_type: Database["public"]["Enums"]["reading_plan_type"]
+          preview_token: string
           slug: string
           status: Database["public"]["Enums"]["content_status"]
           title: string
@@ -546,6 +548,8 @@ export type Database = {
           featured?: boolean
           id?: string
           image_url?: string | null
+          plan_type?: Database["public"]["Enums"]["reading_plan_type"]
+          preview_token?: string
           slug: string
           status?: Database["public"]["Enums"]["content_status"]
           title: string
@@ -560,6 +564,8 @@ export type Database = {
           featured?: boolean
           id?: string
           image_url?: string | null
+          plan_type?: Database["public"]["Enums"]["reading_plan_type"]
+          preview_token?: string
           slug?: string
           status?: Database["public"]["Enums"]["content_status"]
           title?: string
@@ -655,6 +661,7 @@ export type Database = {
       content_status: "draft" | "in_review" | "published"
       lesson_progress_status: "not_started" | "in_progress" | "done"
       message_status: "new" | "read" | "archived"
+      reading_plan_type: "reading_plan" | "commentary"
       resource_category:
         | "Articles"
         | "Bible Studies"
@@ -688,12 +695,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -717,11 +724,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -742,11 +749,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -767,11 +774,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -784,11 +791,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -815,6 +822,7 @@ export const Constants = {
       content_status: ["draft", "in_review", "published"],
       lesson_progress_status: ["not_started", "in_progress", "done"],
       message_status: ["new", "read", "archived"],
+      reading_plan_type: ["reading_plan", "commentary"],
       resource_category: [
         "Articles",
         "Bible Studies",

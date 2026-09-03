@@ -46,4 +46,12 @@ export type ReadingPlan = {
   title: string;
   excerpt: string;
   imageUrl: string | null;
+  planType: "reading_plan" | "commentary";
+};
+
+export type ReadingPlanDay = {
+  dayNumber: number;
+  title: string;
+  passageRef: string;
+  contentHtml: string;
 };

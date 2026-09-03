@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import { ShareButton } from "@/components/ui/ShareButton";
+import type { ReadingPlanDayDraft } from "@/lib/queries/admin-reading-plans";
 
 // Shows exactly how the current (possibly unsaved) form values will render
 // on the public /reading-plans page — reuses the same markup as
@@ -16,6 +18,8 @@ export function ReadingPlanPreviewModal({
   bodyHtml,
   imageUrl,
   featured,
+  planType,
+  days,
   onClose,
 }: {
   title: string;
@@ -25,13 +29,17 @@ export function ReadingPlanPreviewModal({
   bodyHtml: string;
   imageUrl: string;
   featured: boolean;
+  planType: "reading_plan" | "commentary";
+  days: ReadingPlanDayDraft[];
   onClose: () => void;
 }) {
+  const [activeDay, setActiveDay] = useState(1);
   const duration =
     durationDays === "" ? "— days" : `${durationDays} day${durationDays === 1 ? "" : "s"}`;
   const displayTitle = title.trim() || "Untitled reading plan";
   const displayExcerpt =
     excerpt.trim() || "No excerpt yet — this is where the plan summary appears.";
+  const currentDay = days.find((d) => d.dayNumber === activeDay);
 
   return (
     <div className="fixed inset-0 z-[400] overflow-y-auto bg-[rgba(26,26,26,0.55)] p-6">
@@ -146,7 +154,55 @@ export function ReadingPlanPreviewModal({
             )}
 
             <div className="mx-auto max-w-[600px] pt-10">
-              {bodyHtml ? (
+              {planType === "commentary" ? (
+                days.length === 0 ? (
+                  <p className="text-ink-muted font-reading text-[15px] italic">
+                    No days added yet — this is where the day-by-day content will appear.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mb-7 flex flex-wrap gap-2">
+                      {days.map((d) => (
+                        <button
+                          key={d.dayNumber}
+                          type="button"
+                          onClick={() => setActiveDay(d.dayNumber)}
+                          className={
+                            "font-ui rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors " +
+                            (d.dayNumber === activeDay
+                              ? "bg-ink text-cream"
+                              : "bg-cream text-ink-muted hover:text-ink")
+                          }
+                        >
+                          Day {d.dayNumber}
+                        </button>
+                      ))}
+                    </div>
+                    {currentDay && (
+                      <div className="mb-6">
+                        <h3 className="font-display text-[20px] font-semibold">
+                          {currentDay.title}
+                        </h3>
+                        {currentDay.passageRef && (
+                          <p className="text-gold-deep mt-1 text-[13px] font-semibold">
+                            {currentDay.passageRef}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {currentDay?.content ? (
+                      <div
+                        className="prose-editor font-reading text-ink-muted text-[16px] leading-[1.85]"
+                        dangerouslySetInnerHTML={{ __html: currentDay.content }}
+                      />
+                    ) : (
+                      <p className="text-ink-muted font-reading text-[15px] italic">
+                        Nothing written yet for this day.
+                      </p>
+                    )}
+                  </>
+                )
+              ) : bodyHtml ? (
                 <div
                   className="prose-editor font-reading text-ink-muted text-[16px] leading-[1.85]"
                   dangerouslySetInnerHTML={{ __html: bodyHtml }}

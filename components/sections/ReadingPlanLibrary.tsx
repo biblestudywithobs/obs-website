@@ -131,6 +131,11 @@ export function ReadingPlanLibrary({
                   <span className="bg-paper absolute top-[14px] right-[14px] rounded-full px-2.5 py-[5px] text-[11px] font-bold">
                     {p.duration}
                   </span>
+                  {p.planType === "commentary" && (
+                    <span className="bg-gold text-ink absolute top-[14px] left-[14px] rounded-full px-2.5 py-[5px] text-[11px] font-bold uppercase tracking-[0.03em]">
+                      Commentary
+                    </span>
+                  )}
                 </div>
                 <div className="px-[22px] pt-5 pb-[22px]">
                   <h3 className="font-display mb-2 text-[17.5px] leading-[1.3] font-semibold">
