@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
-import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { sanitizeArticleHtml, isBlankHtml } from "@/lib/sanitize-html";
 import { uploadPublicFile } from "@/lib/storage";
 import type { Enums } from "@/types/database";
 
@@ -31,7 +31,7 @@ function parseDaysFromFormData(formData: FormData): {
       dayNumber: i + 1,
       title: title || `Day ${i + 1}`,
       passageRef,
-      content: rawContent ? sanitizeArticleHtml(rawContent) : "",
+      content: isBlankHtml(rawContent) ? "" : sanitizeArticleHtml(rawContent),
     });
   }
   return days;
@@ -83,7 +83,7 @@ export async function saveReadingPlan(
   const featured = formData.get("featured") === "on";
   const planType = String(formData.get("planType") ?? "reading_plan") as Enums<"reading_plan_type">;
   const rawBodyHtml = String(formData.get("bodyHtml") ?? "").trim();
-  const bodyHtml = rawBodyHtml ? sanitizeArticleHtml(rawBodyHtml) : null;
+  const bodyHtml = isBlankHtml(rawBodyHtml) ? null : sanitizeArticleHtml(rawBodyHtml);
 
   if (!title || !category || !excerpt || !durationDays) {
     return { error: "Title, category, duration, and excerpt are required." };

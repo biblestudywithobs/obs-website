@@ -29,3 +29,12 @@ export function sanitizeArticleHtml(html: string): string {
     allowedSchemes: ["http", "https", "mailto"],
   });
 }
+
+// Tiptap's "empty" document isn't an empty string — it's `<p></p>` (or a
+// few blank paragraphs/whitespace). Treating that as real content means an
+// untouched editor silently overwrites a null/"nothing written yet" state
+// with a blank paragraph every time the surrounding form is saved.
+export function isBlankHtml(html: string | null | undefined): boolean {
+  if (!html) return true;
+  return html.replace(/<[^>]*>/g, "").trim() === "";
+}

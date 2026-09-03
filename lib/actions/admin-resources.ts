@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireProfile } from "@/lib/auth";
-import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { sanitizeArticleHtml, isBlankHtml } from "@/lib/sanitize-html";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slugify";
 import type { Enums } from "@/types/database";
@@ -35,7 +35,7 @@ export async function saveResource(
   // Sanitized server-side too, not just trusted from the editor client — the
   // public article page renders this with dangerouslySetInnerHTML.
   const rawBodyHtml = String(formData.get("bodyHtml") ?? "").trim();
-  const bodyHtml = rawBodyHtml ? sanitizeArticleHtml(rawBodyHtml) : null;
+  const bodyHtml = isBlankHtml(rawBodyHtml) ? null : sanitizeArticleHtml(rawBodyHtml);
 
   const supabase = await createClient();
 

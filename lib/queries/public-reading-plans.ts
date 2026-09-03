@@ -1,6 +1,6 @@
 import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { sanitizeArticleHtml, isBlankHtml } from "@/lib/sanitize-html";
 import type { ReadingPlan, ReadingPlanDay } from "@/types/content";
 
 export type FeaturedPlan = {
@@ -105,7 +105,7 @@ async function fetchDays(
     dayNumber: d.day_number,
     title: d.title,
     passageRef: d.passage_ref ?? "",
-    contentHtml: d.content ? sanitizeArticleHtml(d.content) : "",
+    contentHtml: isBlankHtml(d.content) ? "" : sanitizeArticleHtml(d.content ?? ""),
   }));
 }
 
@@ -132,7 +132,7 @@ export async function getPublishedReadingPlanBySlug(
     category: data.category,
     duration: `${data.duration_days} day${data.duration_days === 1 ? "" : "s"}`,
     excerpt: data.excerpt,
-    bodyHtml: data.body_html ? sanitizeArticleHtml(data.body_html) : "",
+    bodyHtml: isBlankHtml(data.body_html) ? "" : sanitizeArticleHtml(data.body_html ?? ""),
     imageUrl: data.image_url,
     updated: `Updated ${new Date(data.updated_at).toLocaleDateString("en-US", {
       month: "short",
@@ -171,7 +171,7 @@ export async function getReadingPlanByPreviewToken(
     category: data.category,
     duration: `${data.duration_days} day${data.duration_days === 1 ? "" : "s"}`,
     excerpt: data.excerpt,
-    bodyHtml: data.body_html ? sanitizeArticleHtml(data.body_html) : "",
+    bodyHtml: isBlankHtml(data.body_html) ? "" : sanitizeArticleHtml(data.body_html ?? ""),
     imageUrl: data.image_url,
     updated: `Updated ${new Date(data.updated_at).toLocaleDateString("en-US", {
       month: "short",

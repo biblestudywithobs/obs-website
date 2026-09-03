@@ -1,5 +1,5 @@
 import { createPublicClient } from "@/lib/supabase/public";
-import { sanitizeArticleHtml } from "@/lib/sanitize-html";
+import { sanitizeArticleHtml, isBlankHtml } from "@/lib/sanitize-html";
 import { staffRoleLabels } from "@/types/staff";
 import { getSubstackArticles } from "@/lib/substack";
 import type { Resource, LibraryResource } from "@/types/content";
@@ -126,7 +126,7 @@ export async function getPublishedResourceBySlug(slug: string): Promise<ArticleD
 
   if (!data) return null;
 
-  const bodyHtml = data.body_html ? sanitizeArticleHtml(data.body_html) : "";
+  const bodyHtml = isBlankHtml(data.body_html) ? "" : sanitizeArticleHtml(data.body_html ?? "");
   const wordCount = bodyHtml
     .replace(/<[^>]+>/g, " ")
     .split(/\s+/)
