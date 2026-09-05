@@ -10,11 +10,30 @@ import { getReadingPlanByPreviewToken } from "@/lib/queries/public-reading-plans
 export const dynamic = "force-dynamic";
 
 // Never indexed — this is a capability URL for reviewing unpublished drafts,
-// not a real page.
-export const metadata: Metadata = {
-  title: "Draft preview — Open Bible School",
-  robots: { index: false, follow: false },
-};
+// not a real page. Still carries the plan's own title/excerpt (and, via the
+// colocated opengraph-image.tsx, its cover image + a Preview/Published
+// badge) so sharing the link for review shows more than a generic card.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}): Promise<Metadata> {
+  const { token } = await params;
+  const plan = await getReadingPlanByPreviewToken(token);
+  const robots = { index: false, follow: false };
+  if (!plan) return { title: "Draft preview — Open Bible School", robots };
+
+  const label = plan.status === "published" ? "Preview" : "Draft preview";
+  const title = `${label}: ${plan.title} — Open Bible School`;
+
+  return {
+    title,
+    description: plan.excerpt || undefined,
+    robots,
+    openGraph: { title, description: plan.excerpt || undefined, type: "article" },
+    twitter: { title, description: plan.excerpt || undefined },
+  };
+}
 
 export default async function ReadingPlanPreviewPage({
   params,
