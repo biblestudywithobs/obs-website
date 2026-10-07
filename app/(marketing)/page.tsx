@@ -6,6 +6,7 @@ import { NewsletterForm } from "@/components/layout/NewsletterForm";
 import { ResourceCard } from "@/components/cards/ResourceCard";
 import { SessionCard } from "@/components/cards/SessionCard";
 import { LatestFromOBS } from "@/components/sections/LatestFromOBS";
+import { VolunteerCallout } from "@/components/sections/VolunteerCallout";
 import { SubstackIcon, MediumIcon, YouTubeIcon, SpotifyIcon } from "@/components/ui/BrandIcons";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { listFeaturedResources } from "@/lib/queries/public-resources";
@@ -241,6 +242,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {/* ================= VOLUNTEER CALLOUT ================= */}
+        <VolunteerCallout />
 
         {/* ================= FEATURED RESOURCES ================= */}
         <section id="resources" className="section-pad">

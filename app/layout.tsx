@@ -42,12 +42,49 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  // Set GOOGLE_SITE_VERIFICATION to the token from Google Search Console
+  // (Settings → Ownership verification → HTML tag) to verify the domain.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
     images: ["/logo.jpg"],
   },
+};
+
+// Structured data so Google understands who OBS is and can show the site
+// name, logo and social profiles in search results.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://biblestudywithobs.com/#organization",
+      name: "Open Bible School",
+      alternateName: "BibleStudyWithOBS",
+      url: "https://biblestudywithobs.com",
+      logo: "https://biblestudywithobs.com/logo.jpg",
+      description: siteDescription,
+      sameAs: [
+        "https://www.instagram.com/openbibleschool/",
+        "https://www.youtube.com/@studywithOBS",
+        "https://open.spotify.com/show/0G6DSKiA0fA6UYcxpEOcCl",
+        "https://biblestudywithobs.substack.com",
+        "https://medium.com/@biblestudywithobs",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://biblestudywithobs.com/#website",
+      name: "Open Bible School",
+      url: "https://biblestudywithobs.com",
+      publisher: { "@id": "https://biblestudywithobs.com/#organization" },
+      inLanguage: "en",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -58,6 +95,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${lora.variable} ${inter.variable} h-full`}>
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>

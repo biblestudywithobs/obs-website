@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import type { applicationAreas } from "@/lib/validation/forms";
@@ -8,7 +8,17 @@ import type { applicationAreas } from "@/lib/validation/forms";
 type Area = (typeof applicationAreas)[number];
 
 type DetailField =
-  | { kind: "select"; label: string; options: string[] }
+  | {
+      kind: "select";
+      label: string;
+      options: string[];
+      // Shown in the list but not yet accepting applications; picking one
+      // opens a "not open yet" dialog instead of selecting it.
+      closedOptions?: string[];
+      // Extra content (e.g. a role description) shown under the select when
+      // that option is chosen.
+      optionDetails?: Record<string, React.ReactNode>;
+    }
   | { kind: "text"; label: string; placeholder?: string };
 
 type Status = "idle" | "submitting" | "done" | "error";
@@ -50,6 +60,22 @@ export function ApplicationForm({
   submitLabel?: string;
 }) {
   const [status, setStatus] = useState<Status>("idle");
+  const [selectedOption, setSelectedOption] = useState("");
+  const closedDialogRef = useRef<HTMLDialogElement>(null);
+
+  const closedOptions = detailField?.kind === "select" ? (detailField.closedOptions ?? []) : [];
+  const selectedDetails =
+    detailField?.kind === "select" ? detailField.optionDetails?.[selectedOption] : undefined;
+
+  function handleDetailChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    if (closedOptions.includes(e.target.value)) {
+      // Keep the previous choice rather than selecting a closed role.
+      e.target.value = selectedOption;
+      closedDialogRef.current?.showModal();
+      return;
+    }
+    setSelectedOption(e.target.value);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -84,6 +110,7 @@ export function ApplicationForm({
       if (result.ok) {
         setStatus("done");
         form.reset();
+        setSelectedOption("");
       } else {
         setStatus("error");
       }
@@ -167,18 +194,30 @@ export function ApplicationForm({
             {detailField.label}
           </label>
           {detailField.kind === "select" ? (
-            <select
-              id="apply-detail"
-              name="detail"
-              required
-              className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
-            >
-              {detailField.options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
+            <>
+              <select
+                id="apply-detail"
+                name="detail"
+                required
+                value={selectedOption}
+                onChange={handleDetailChange}
+                className="border-line bg-paper font-ui focus:border-gold-deep w-full rounded-[10px] border px-3.5 py-3 text-[14px] focus:outline-none"
+              >
+                <option value="" disabled>
+                  Select a team
                 </option>
-              ))}
-            </select>
+                {detailField.options.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {closedOptions.includes(opt) ? `${opt} (opening soon)` : opt}
+                  </option>
+                ))}
+              </select>
+              {selectedDetails && (
+                <div className="border-line bg-paper mt-3 rounded-[10px] border px-4 py-4 text-[13.5px] leading-[1.6]">
+                  {selectedDetails}
+                </div>
+              )}
+            </>
           ) : (
             <input
               type="text"
@@ -359,6 +398,35 @@ export function ApplicationForm({
       <Button type="submit" disabled={status === "submitting"}>
         {status === "submitting" ? "Submitting…" : submitLabel}
       </Button>
+
+      {closedOptions.length > 0 && (
+        <dialog
+          ref={closedDialogRef}
+          aria-labelledby="closed-role-title"
+          onClick={(e) => {
+            // Close when the backdrop (the dialog element itself) is clicked.
+            if (e.target === e.currentTarget) e.currentTarget.close();
+          }}
+          className="border-line bg-paper text-ink m-auto w-[min(420px,calc(100vw-32px))] rounded-[14px] border p-0 backdrop:bg-black/50"
+        >
+          <div className="px-6 py-6 text-center">
+            <h2 id="closed-role-title" className="font-display text-[22px] font-semibold">
+              Oops, you can&apos;t apply to this role yet
+            </h2>
+            <p className="font-reading text-ink-muted mt-3 text-[15px] leading-[1.6]">
+              Don&apos;t worry — keep refreshing. We&apos;ll let you know once it&apos;s open.
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              className="mt-5"
+              onClick={() => closedDialogRef.current?.close()}
+            >
+              Got it
+            </Button>
+          </div>
+        </dialog>
+      )}
     </form>
   );
 }
