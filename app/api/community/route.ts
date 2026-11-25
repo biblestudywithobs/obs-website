@@ -35,6 +35,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  // Volunteer applications are closed until the 2027 season.
+  if (parsed.data.area === "volunteer") {
+    return NextResponse.json(
+      { ok: false, error: "We're not accepting volunteer applications this season." },
+      { status: 403 },
+    );
+  }
+
   const {
     name,
     email,

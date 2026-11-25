@@ -10,7 +10,7 @@ const PLAN_STATS = [
 ];
 
 // Homepage CTA: celebrates the reach of our most-read reading plan and
-// points people to the volunteer page for the roles that growth needs.
+// currently tells people volunteer applications are closed until the 2027 season.
 export function VolunteerCallout() {
   return (
     <section>
@@ -27,17 +27,25 @@ export function VolunteerCallout() {
               is reaching readers in 94 countries.
             </h2>
             <p className="font-reading text-cream/75 mt-4 max-w-[52ch] text-[17px] leading-[1.65]">
-              God is taking our YouVersion plan further than we imagined. To keep up, we&apos;re
-              looking for <strong className="text-cream">French translators</strong> to bring our
-              reading plans and Bible commentaries to French speakers, and{" "}
-              <strong className="text-cream">software engineers</strong> to help build our website.
+              God is taking our YouVersion plan further than we imagined, and we&apos;re grateful
+              for everyone who has offered to serve. We&apos;re{" "}
+              <strong className="text-cream">not accepting new volunteer applications</strong> this
+              season. Our new season starts in <strong className="text-cream">2027</strong>. If you
+              would like us to keep you in mind until then, send us an email and we&apos;ll hold
+              your details for when applications reopen.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
-              <Link
-                href="/community/volunteer"
+              <a
+                href="mailto:hello@biblestudywithobs.com?subject=Keep%20me%20in%20mind%20for%20the%202027%20season"
                 className="bg-gold border-gold text-ink inline-flex items-center justify-center rounded-full border px-[22px] py-[11px] text-[14.5px] leading-[1.2] font-medium tracking-[0.06em] uppercase shadow-[3px_3px_0_var(--color-cream)] transition-[transform,box-shadow] duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--color-cream)]"
               >
-                Volunteer With Us
+                Email Us
+              </a>
+              <Link
+                href="/community/volunteer"
+                className="text-cream/80 hover:text-cream text-[14.5px] underline underline-offset-4"
+              >
+                See volunteer teams
               </Link>
             </div>
           </div>
