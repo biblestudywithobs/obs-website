@@ -43,6 +43,14 @@ export async function POST(request: Request) {
     );
   }
 
+  // Internship applications are closed until the 2027 season.
+  if (parsed.data.area === "internship") {
+    return NextResponse.json(
+      { ok: false, error: "We're not accepting internship applications this season." },
+      { status: 403 },
+    );
+  }
+
   const {
     name,
     email,
